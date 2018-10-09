@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="1.빌드" name="[1. 빌드]">
+
+	<property name="루트폴더" value="."/>
+	<property name="JDK버전" value="8"/>
+	<property name="라이브러리명" value="net.asdf"/>
+	<property name="라이브러리경로" value="WEB-INF/lib"/>
+	<property name="워크스페이스" value="${루트폴더}/.."/>
+
+	<property name="버전" value="1.1.11" />
+
+	<tstamp>
+		<format property="DSTAMP" pattern="yyyyMMdd" />
+		<format property="TSTAMP" pattern="HHmmss" />
+	</tstamp>
+
+	<target name="1.빌드" depends="1.1.프레임워크빌드" />
+
+	<target name="1.1.프레임워크빌드">
+		<echo>프레임워크 빌드</echo>
+		<jar destfile="${루트폴더}/net.asdf-${버전}-JDK${JDK버전}.jar">
+			<fileset dir="${루트폴더}/bin" />
+		</jar>
+	</target>
+</project>
