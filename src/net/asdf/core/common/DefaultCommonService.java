@@ -2,14 +2,18 @@
 package net.asdf.core.common;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
 import net.asdf.core.jdbc.transaction.NeedTx;
+import net.asdf.core.jdbc.transaction.NoTx;
 import net.asdf.core.model.Model;
+import net.asdf.core.model.StatefullModel;
 
 @Service
 public class DefaultCommonService implements CommonService {
@@ -17,19 +21,19 @@ public class DefaultCommonService implements CommonService {
 	/**
 	 * 생성 서비스
 	 */
-	@Autowired
+	@Resource
 	private DefaultInsertService defaultInsertService;
 
 	/**
 	 * 수정, 삭제 서비스
 	 */
-	@Autowired
+	@Resource
 	private DefaultUpdateService defaultUpdateService;
 
 	/**
 	 * 조회 서비스
 	 */
-	@Autowired
+	@Resource
 	private DefaultSelectService defaultSelectService;
 
 	/**
@@ -403,16 +407,36 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#get(java.lang.String, net.asdf.core.model.Model, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model, S extends Model> S get(String sql, T param, Class<S> clazz) {
 		return defaultSelectService.get(sql, param, clazz);
 	}
 
+	@NoTx
+	public <T extends Model> Map<String, Object> get(String sql, T param) {
+		return defaultSelectService.get(sql, param);
+	}
+
 	@Override
+	@NoTx
 	public Map<String, Object> get(String sql, Map<String, Object> param) {
 		return defaultSelectService.get(sql, param);
 	}
 
 	@Override
+	@NoTx
+	public Map<String, Object> get(String sql, String value) {
+		return defaultSelectService.get(sql, value);
+	}
+
+	@Override
+	@NoTx
+	public Map<String, Object> get(String sql, Integer value) {
+		return defaultSelectService.get(sql, value);
+	}
+
+	@Override
+	@NoTx
 	public Map<String, Object> get(String sql) {
 		return defaultSelectService.get(sql);
 	}
@@ -422,6 +446,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#getSimple()
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> getSimple() {
 		return defaultSelectService.getSimple();
 	}
@@ -432,6 +457,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#getSimple(java.util.Map)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> getSimple(Map<String, Object> param) {
 		return defaultSelectService.getSimple(param);
 	}
@@ -442,6 +468,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#getSimple(net.asdf.core.model.Model)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> Map<String, Object> getSimple(T param) {
 		return defaultSelectService.getSimple(param);
 	}
@@ -453,6 +480,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#getSimple(java.util.Map, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> T getSimple(Map<String, Object> param, Class<T> clazz) {
 		return defaultSelectService.getSimple(param, clazz);
 	}
@@ -464,7 +492,8 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#getSimple(net.asdf.core.model.Model, java.lang.Class)
 	 */
 	@Override
-	public <T extends Model, S extends Model> S getSimple(T param, Class<S> clazz) {
+	@NoTx
+	public <T extends Model> T getSimple(Model param, Class<T> clazz) {
 		return defaultSelectService.getSimple(param, clazz);
 	}
 
@@ -475,6 +504,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#list(java.lang.String, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> List<T> list(String sql, Class<T> clazz) {
 		return defaultSelectService.list(sql, clazz);
 	}
@@ -485,6 +515,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> one(String sql) {
 		return defaultSelectService.one(sql);
 	}
@@ -496,6 +527,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> T one(String sql, Class<T> clazz) {
 		return defaultSelectService.one(sql, clazz);
 	}
@@ -507,6 +539,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.util.Map)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> one(String sql, Map<String, Object> param) {
 		return defaultSelectService.one(sql, param);
 	}
@@ -518,6 +551,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, net.asdf.core.model.Model)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> Map<String, Object> one(String sql, T param) {
 		return defaultSelectService.one(sql, param);
 	}
@@ -530,6 +564,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.util.Map, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> T one(String sql, Map<String, Object> param, Class<T> clazz) {
 		return defaultSelectService.one(sql, param, clazz);
 	}
@@ -541,7 +576,14 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#oneSimple(java.util.Map, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> T oneSimple(Map<String, Object> param, Class<T> clazz) {
+		return defaultSelectService.oneSimple(param, clazz);
+	}
+
+	@Override
+	@NoTx
+	public <T extends Model> T oneSimple(Model param, Class<T> clazz) {
 		return defaultSelectService.oneSimple(param, clazz);
 	}
 
@@ -551,6 +593,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#oneSimple(java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> T oneSimple(Class<T> clazz) {
 		return defaultSelectService.oneSimple(clazz);
 	}
@@ -560,6 +603,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#oneSimple()
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> oneSimple() {
 		return defaultSelectService.oneSimple();
 	}
@@ -570,6 +614,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#oneSimple(net.asdf.core.model.Model)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> Map<String, Object> oneSimple(T param) {
 		return defaultSelectService.oneSimple(param);
 	}
@@ -580,6 +625,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#oneSimple(java.util.Map)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> oneSimple(Map<String, Object> param) {
 		return defaultSelectService.oneSimple(param);
 	}
@@ -589,6 +635,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple()
 	 */
 	@Override
+	@NoTx
 	public List<Map<String, Object>> listSimple() {
 		return defaultSelectService.listSimple();
 	}
@@ -599,6 +646,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> List<T> listSimple(Class<T> clazz) {
 		return defaultSelectService.listSimple(clazz);
 	}
@@ -609,6 +657,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.util.Map)
 	 */
 	@Override
+	@NoTx
 	public List<Map<String, Object>> listSimple(Map<String, Object> param) {
 		return defaultSelectService.listSimple(param);
 	}
@@ -619,6 +668,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(net.asdf.core.model.Model)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> List<Map<String, Object>> listSimple(T param) {
 		return defaultSelectService.listSimple(param);
 	}
@@ -630,6 +680,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.util.Map, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> List<T> listSimple(Map<String, Object> param, Class<T> clazz) {
 		return defaultSelectService.listSimple(param, clazz);
 	}
@@ -641,6 +692,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(net.asdf.core.model.Model, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model, S extends Model> List<S> listSimple(T param, Class<S> clazz) {
 		return defaultSelectService.listSimple(param, clazz);
 	}
@@ -651,6 +703,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#list(java.lang.String)
 	 */
 	@Override
+	@NoTx
 	public List<Map<String, Object>> list(String sql) {
 		return defaultSelectService.list(sql);
 	}
@@ -662,6 +715,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#list(java.lang.String, net.asdf.core.model.Model)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> List<Map<String, Object>> list(String sql, T param) {
 		return defaultSelectService.list(sql, param);
 	}
@@ -673,6 +727,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#list(java.lang.String, java.util.Map)
 	 */
 	@Override
+	@NoTx
 	public List<Map<String, Object>> list(String sql, Map<String, Object> param) {
 		return defaultSelectService.list(sql, param);
 	}
@@ -685,6 +740,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#list(java.lang.String, java.util.Map, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> List<T> list(String sql, Map<String, Object> param, Class<T> clazz) {
 		return defaultSelectService.list(sql, param, clazz);
 	}
@@ -697,7 +753,8 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#list(java.lang.String, net.asdf.core.model.Model, java.lang.Class)
 	 */
 	@Override
-	public <T extends Model, S extends Model> List<S> list(String sql, T param, Class<S> clazz) {
+	@NoTx
+	public <T extends Model> List<T> list(String sql, Model param, Class<T> clazz) {
 		return defaultSelectService.list(sql, param, clazz);
 	}
 
@@ -707,6 +764,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#oneSimple(java.lang.String)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> oneSimple(String value) {
 		return defaultSelectService.oneSimple(value);
 	}
@@ -717,6 +775,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#oneSimple(java.lang.Integer)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> oneSimple(Integer value) {
 		return defaultSelectService.oneSimple(value);
 	}
@@ -727,6 +786,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#oneSimple(java.lang.Float)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> oneSimple(Float value) {
 		return defaultSelectService.oneSimple(value);
 	}
@@ -737,6 +797,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#oneSimple(java.lang.Double)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> oneSimple(Double value) {
 		return defaultSelectService.oneSimple(value);
 	}
@@ -747,6 +808,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#oneSimple(java.math.BigDecimal)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> oneSimple(BigDecimal value) {
 		return defaultSelectService.oneSimple(value);
 	}
@@ -758,6 +820,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.lang.String)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> one(String sql, String value) {
 		return defaultSelectService.one(sql, value);
 	}
@@ -769,6 +832,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.lang.Integer)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> one(String sql, Integer value) {
 		return defaultSelectService.one(sql, value);
 	}
@@ -780,6 +844,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.lang.Float)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> one(String sql, Float value) {
 		return defaultSelectService.one(sql, value);
 	}
@@ -791,6 +856,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.lang.Double)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> one(String sql, Double value) {
 		return defaultSelectService.one(sql, value);
 	}
@@ -802,6 +868,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.math.BigDecimal)
 	 */
 	@Override
+	@NoTx
 	public Map<String, Object> one(String sql, BigDecimal value) {
 		return defaultSelectService.one(sql, value);
 	}
@@ -814,6 +881,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.lang.String, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> T one(String sql, String value, Class<T> clazz) {
 		return defaultSelectService.one(sql, value, clazz);
 	}
@@ -826,9 +894,12 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.lang.Integer, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> T one(String sql, Integer value, Class<T> clazz) {
 		return defaultSelectService.one(sql, value, clazz);
 	}
+
+
 
 	/**
 	 * @param sql
@@ -838,6 +909,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.lang.Float, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> T one(String sql, Float value, Class<T> clazz) {
 		return defaultSelectService.one(sql, value, clazz);
 	}
@@ -850,6 +922,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.lang.Double, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> T one(String sql, Double value, Class<T> clazz) {
 		return defaultSelectService.one(sql, value, clazz);
 	}
@@ -862,6 +935,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#one(java.lang.String, java.math.BigDecimal, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> T one(String sql, BigDecimal value, Class<T> clazz) {
 		return defaultSelectService.one(sql, value, clazz);
 	}
@@ -872,6 +946,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.lang.String)
 	 */
 	@Override
+	@NoTx
 	public List<Map<String, Object>> listSimple(String value) {
 		return defaultSelectService.listSimple(value);
 	}
@@ -882,6 +957,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.lang.Integer)
 	 */
 	@Override
+	@NoTx
 	public List<Map<String, Object>> listSimple(Integer value) {
 		return defaultSelectService.listSimple(value);
 	}
@@ -892,6 +968,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.lang.Float)
 	 */
 	@Override
+	@NoTx
 	public List<Map<String, Object>> listSimple(Float value) {
 		return defaultSelectService.listSimple(value);
 	}
@@ -902,6 +979,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.lang.Double)
 	 */
 	@Override
+	@NoTx
 	public List<Map<String, Object>> listSimple(Double value) {
 		return defaultSelectService.listSimple(value);
 	}
@@ -912,6 +990,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.math.BigDecimal)
 	 */
 	@Override
+	@NoTx
 	public List<Map<String, Object>> listSimple(BigDecimal value) {
 		return defaultSelectService.listSimple(value);
 	}
@@ -923,6 +1002,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.lang.String, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> List<T> listSimple(String value, Class<T> clazz) {
 		return defaultSelectService.listSimple(value, clazz);
 	}
@@ -934,6 +1014,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.lang.Integer, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> List<T> listSimple(Integer value, Class<T> clazz) {
 		return defaultSelectService.listSimple(value, clazz);
 	}
@@ -945,6 +1026,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.lang.Float, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> List<T> listSimple(Float value, Class<T> clazz) {
 		return defaultSelectService.listSimple(value, clazz);
 	}
@@ -956,6 +1038,7 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.lang.Double, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> List<T> listSimple(Double value, Class<T> clazz) {
 		return defaultSelectService.listSimple(value, clazz);
 	}
@@ -967,11 +1050,13 @@ public class DefaultCommonService implements CommonService {
 	 * @see net.asdf.core.common.DefaultSelectService#listSimple(java.math.BigDecimal, java.lang.Class)
 	 */
 	@Override
+	@NoTx
 	public <T extends Model> List<T> listSimple(BigDecimal value, Class<T> clazz) {
 		return defaultSelectService.listSimple(value, clazz);
 	}
 
 	@Override
+	@NoTx
 	public <T extends Model, S extends Model> S one(String sql, T param, Class<S> clazz) {
 		return defaultSelectService.one(sql, param, clazz);
 	}
@@ -984,18 +1069,170 @@ public class DefaultCommonService implements CommonService {
 	 * @return 입력된 행 수
 	 */
 	@Override
+	@NoTx
 	public int insertAndGet(String sql, Map<String, Object> param, String[] columns) {
 		return defaultInsertService.insertAndGet(sql, param, columns);
 	}
 
 	@Override
+	@NoTx
 	public int updateAndGet(String sql, Map<String, Object> param, String[] columns) {
 		return defaultUpdateService.updateAndGet(sql, param, columns);
 	}
 
 	@Override
+	@NoTx
 	public <T extends Model> int updateAndGet(String sql, T model) {
 		return defaultUpdateService.updateAndGet(sql, model);
 	}
+
+	@Override
+	@NoTx
+	public <T extends Model> List<T> list(String sql, Integer value, Class<T> clazz) {
+		return defaultSelectService.list(sql, value, clazz);
+	}
+
+	@Override
+	@NeedTx
+	public int[] saveMap(String sqlPrefix, List<Map<String, Object>> 저장할데이터목록) {
+		int[] 결과건수 = {0, 0, 0, 0};
+
+		if(저장할데이터목록.size() == 0) {
+			return 결과건수;
+		}
+		for(Map<String, Object> 저장할데이터 : 저장할데이터목록) {
+			switch((String)저장할데이터.get(StatefullModel.ROW_STATUS_FIELD)) {
+			case StatefullModel.STATUS_INSERT:
+
+				defaultInsertService.insert(sqlPrefix + ".신규", 저장할데이터);
+				결과건수[0]++;
+				break;
+			case StatefullModel.STATUS_UPDATE:
+				defaultUpdateService.update(sqlPrefix + ".수정", 저장할데이터);
+				결과건수[1]++;
+				break;
+			case StatefullModel.STATUS_DELETE:
+				defaultUpdateService.update(sqlPrefix + ".삭제", 저장할데이터);
+				결과건수[2]++;
+				break;
+			default:
+				결과건수[3]++;
+			}
+		}
+
+		return 결과건수;
+	}
+
+	@Override
+	@NeedTx
+	public <T extends StatefullModel> int[]  saveModel(String sqlPrefix, List<T> 저장할데이터목록, boolean useAndGet) {
+		int[] 결과건수 = {0, 0, 0};
+
+		if(저장할데이터목록.size() == 0) {
+			return 결과건수;
+		}
+
+		for(StatefullModel 저장할데이터 : 저장할데이터목록) {
+			switch(저장할데이터.getRowStatus()) {
+			case StatefullModel.STATUS_INSERT:
+				if(useAndGet) {
+					defaultInsertService.insertAndGet(sqlPrefix + ".신규", 저장할데이터);
+				}else {
+					defaultInsertService.insert(sqlPrefix + ".신규", 저장할데이터);
+				}
+				결과건수[0]++;
+				break;
+			case StatefullModel.STATUS_UPDATE:
+				if(useAndGet) {
+					defaultUpdateService.updateAndGet(sqlPrefix + ".수정", 저장할데이터);
+				}else {
+					defaultUpdateService.update(sqlPrefix + ".수정", 저장할데이터);
+				}
+				결과건수[1]++;
+				break;
+			case StatefullModel.STATUS_DELETE:
+				defaultUpdateService.update(sqlPrefix + ".삭제", 저장할데이터);
+				결과건수[2]++;
+				break;
+			default:
+				결과건수[3]++;
+			}
+		}
+
+		return 결과건수;
+	}
+
+	@Override
+	public <T extends StatefullModel> int[] loopMap(String sql, List<Map<String, Object>> 저장할데이터목록, String dataStatus, String sqlStatus) {
+
+		int[] 결과건수 = new int[저장할데이터목록.size()];
+
+		Arrays.fill(결과건수, 0);
+
+		if(저장할데이터목록.size() == 0) {
+			return 결과건수;
+		}
+		for(int i = 0; i < 저장할데이터목록.size(); i++){
+			Map<String, Object> 저장할데이터 = 저장할데이터목록.get(i);
+
+			if(dataStatus.equals(저장할데이터.get(StatefullModel.ROW_STATUS_FIELD))) {
+				switch(sqlStatus) {
+				case StatefullModel.STATUS_INSERT:
+					결과건수[i] = defaultInsertService.insert(sql, 저장할데이터);
+					break;
+				case StatefullModel.STATUS_UPDATE:
+					결과건수[i] = defaultUpdateService.update(sql, 저장할데이터);
+					break;
+				case StatefullModel.STATUS_DELETE:
+					결과건수[i] = defaultUpdateService.update(sql, 저장할데이터);
+					break;
+				default:
+					결과건수[i]++;
+				}
+			}
+		}
+		return 결과건수;
+	}
+
+	@Override
+	public <T extends StatefullModel> int[] loopModel(String sql, List<T> 저장할데이터목록, String dataStatus, String sqlStatus, boolean useAndGet) {
+		int[] 결과건수 = new int[저장할데이터목록.size()];
+
+		Arrays.fill(결과건수, 0);
+
+		if(저장할데이터목록.size() == 0) {
+			return 결과건수;
+		}
+
+		for(int i = 0; i < 저장할데이터목록.size(); i++){
+			StatefullModel 저장할데이터 = 저장할데이터목록.get(i);
+			if(dataStatus.equals(저장할데이터.getRowStatus())) {
+				switch(sqlStatus) {
+					case StatefullModel.STATUS_INSERT:
+						if(useAndGet) {
+							결과건수[i] = defaultInsertService.insertAndGet(sql, 저장할데이터);
+						}else {
+							결과건수[i] = defaultInsertService.insert(sql, 저장할데이터);
+						}
+						break;
+					case StatefullModel.STATUS_UPDATE:
+						if(useAndGet) {
+							결과건수[i] = defaultUpdateService.updateAndGet(sql, 저장할데이터);
+						}else {
+							결과건수[i] = defaultUpdateService.update(sql, 저장할데이터);
+						}
+						break;
+					case StatefullModel.STATUS_DELETE:
+						결과건수[i] = defaultUpdateService.update(sql, 저장할데이터);
+						break;
+					default:
+						결과건수[i]++;
+				}
+			}
+		}
+
+		return 결과건수;
+	}
+
 
 }

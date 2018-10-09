@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.asdf.core.model.Model;
+import net.asdf.core.model.StatefullModel;
 
 /**
  * 단순 CRUD 서비스를 제공한다.
@@ -65,7 +66,9 @@ public interface CommonService {
 
 	Map<String, Object> oneSimple(String value);
 
-	<T extends Model, S extends Model> List<S> list(String sql, T param, Class<S> clazz);
+	<T extends Model> List<T> list(String sql, Integer value, Class<T> clazz);
+
+	<T extends Model> List<T> list(String sql, Model param, Class<T> clazz);
 
 	<T extends Model> List<T> list(String sql, Map<String, Object> param, Class<T> clazz);
 
@@ -97,6 +100,8 @@ public interface CommonService {
 
 	<T extends Model> T oneSimple(Map<String, Object> param, Class<T> clazz);
 
+	<T extends Model> T oneSimple(Model param, Class<T> clazz);
+
 	<T extends Model> T one(String sql, Map<String, Object> param, Class<T> clazz);
 
 	<T extends Model, S extends Model> S one(String sql, T param, Class<S> clazz);
@@ -111,7 +116,7 @@ public interface CommonService {
 
 	<T extends Model> List<T> list(String sql, Class<T> clazz);
 
-	<T extends Model, S extends Model> S getSimple(T param, Class<S> clazz);
+	<T extends Model> T getSimple(Model param, Class<T> clazz);
 
 	<T extends Model> T getSimple(Map<String, Object> param, Class<T> clazz);
 
@@ -123,7 +128,13 @@ public interface CommonService {
 
 	<T extends Model, S extends Model> S get(String sql, T param, Class<S> clazz);
 
+	<T extends Model> Map<String, Object> get(String sql, T param);
+
 	Map<String, Object> get(String sql, Map<String, Object> param);
+
+	Map<String, Object> get(String sql, String param);
+
+	Map<String, Object> get(String sql, Integer param);
 
 	Map<String, Object> get(String sql);
 
@@ -198,5 +209,14 @@ public interface CommonService {
 	int insertSimple(Map<String, Object> param);
 
 	int insertSimple();
+
+	int[] saveMap(String sqlPrefix, List<Map<String, Object>> 저장할데이터목록);
+
+	<T extends StatefullModel> int[] loopMap(String sql, List<Map<String, Object>> 저장할데이터목록, String dataStatus, String sqlStatus);
+
+	<T extends StatefullModel> int[] saveModel(String sqlPrefix, List<T> 저장할데이터목록, boolean useAndGet);
+
+	<T extends StatefullModel> int[] loopModel(String sql, List<T> 저장할데이터목록, String dataStatus, String sqlStatus, boolean useAndGet);
+
 
 }
