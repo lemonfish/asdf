@@ -19,9 +19,11 @@ public class IsNull implements FreeMarkerQueryTool, FreeMarkerViewTool  {
 	@Value("#{config['query.databasetype'] ?: 'oracle'}")
 	protected String databaseType;
 
+	private String[] names = new String[] {"isNull", "in"};
+
 	@Override
-	public String getName() {
-		return "isNull";
+	public String[] getNames() {
+		return names;
 	}
 
 	@Override
@@ -30,7 +32,7 @@ public class IsNull implements FreeMarkerQueryTool, FreeMarkerViewTool  {
 		List<TemplateModel> models = arguments;
 		if(arguments.size() == 0) return TemplateBooleanModel.TRUE;
 		for(TemplateModel model : models) {
-			if(model == null) continue;
+			if(model == null || "EmptyStringAndSequenceAndHash".equals(model.getClass().getSimpleName())) continue;
 			String value = getValue(model);
 
 			if(!("".equals(value) || "undefined".equals(value))) {

@@ -5,7 +5,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Component;
 
 import net.asdf.core.model.Model;
@@ -13,13 +14,13 @@ import net.asdf.core.model.Model;
 @Component
 public class DefaultCommonDao implements CommonDao {
 
-	@Autowired
+	@Resource
 	private DefaultInsertDao c;
-	@Autowired
+	@Resource
 	private DefaultUpdateDao u;
-	@Autowired
+	@Resource
 	private DefaultSelectDao r;
-	@Autowired
+	@Resource
 	private DefaultCallDao p;
 
 	/* (non-Javadoc)
@@ -306,7 +307,7 @@ public class DefaultCommonDao implements CommonDao {
 	 * @see net.asdf.core.data.CommonDao#list(java.lang.String, T, java.lang.Class, int, int)
 	 */
 	@Override
-	public <T extends Model, S extends Model> List<S> list(String sql, T param, Class<S> clazz, int fetchSize,
+	public <S extends Model> List<S> list(String sql, Model param, Class<S> clazz, int fetchSize,
 			int maxRows) {
 		return r.list(sql, param, clazz, fetchSize, maxRows);
 	}
@@ -314,21 +315,21 @@ public class DefaultCommonDao implements CommonDao {
 	 * @see net.asdf.core.data.CommonDao#list(java.lang.String, T, java.lang.Class, int)
 	 */
 	@Override
-	public <T extends Model, S extends Model> List<S> list(String sql, T param, Class<S> clazz, int fetchSize) {
+	public <S extends Model> List<S> list(String sql, Model param, Class<S> clazz, int fetchSize) {
 		return r.list(sql, param, clazz, fetchSize);
 	}
 	/* (non-Javadoc)
 	 * @see net.asdf.core.data.CommonDao#list(java.lang.String, T, int, int)
 	 */
 	@Override
-	public <T extends Model> List<Map<String, Object>> list(String sql, T param, int fetchSize, int maxRows) {
+	public List<Map<String, Object>> list(String sql, Model param, int fetchSize, int maxRows) {
 		return r.list(sql, param, fetchSize, maxRows);
 	}
 	/* (non-Javadoc)
 	 * @see net.asdf.core.data.CommonDao#list(java.lang.String, T, int)
 	 */
 	@Override
-	public <T extends Model> List<Map<String, Object>> list(String sql, T param, int fetchSize) {
+	public List<Map<String, Object>> list(String sql, Model param, int fetchSize) {
 		return r.list(sql, param, fetchSize);
 	}
 	/* (non-Javadoc)
@@ -364,7 +365,7 @@ public class DefaultCommonDao implements CommonDao {
 	 * @see net.asdf.core.data.CommonDao#list(java.lang.String, T, java.lang.Class)
 	 */
 	@Override
-	public <T extends Model, S extends Model> List<S> list(String sql, T param, Class<S> clazz) {
+	public <S extends Model> List<S> list(String sql, Model param, Class<S> clazz) {
 		return r.list(sql, param, clazz);
 	}
 	/* (non-Javadoc)
@@ -378,7 +379,7 @@ public class DefaultCommonDao implements CommonDao {
 	 * @see net.asdf.core.data.CommonDao#list(java.lang.String, T)
 	 */
 	@Override
-	public <T extends Model> List<Map<String, Object>> list(String sql, T param) {
+	public List<Map<String, Object>> list(String sql, Model param) {
 		return r.list(sql, param);
 	}
 	/* (non-Javadoc)

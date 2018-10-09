@@ -13,9 +13,11 @@ import net.asdf.core.query.template.freemarker.FreeMarkerViewTool;
 @Component
 public class UuidForView implements FreeMarkerViewTool{
 
+	private String[] names = new String[] {"uuid"};
+
 	@Override
-	public String getName() {
-		return "uuid";
+	public String[] getNames() {
+		return names;
 	}
 
 	@Override

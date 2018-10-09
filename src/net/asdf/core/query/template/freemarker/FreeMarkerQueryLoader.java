@@ -5,16 +5,22 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import freemarker.cache.TemplateLoader;
+import net.asdf.core.query.Query;
 import net.asdf.core.query.QueryLoader;
 
 @Component
 public class FreeMarkerQueryLoader implements TemplateLoader {
 
-	@Autowired
+	protected Logger logger = LogManager.getLogger(this);
+
+	@Resource
 	private QueryLoader queryLoader;
 
 	@Override
@@ -24,7 +30,12 @@ public class FreeMarkerQueryLoader implements TemplateLoader {
 
 	@Override
 	public long getLastModified(Object templateSource) {
-		return queryLoader.getQuery((String) templateSource).getLastModified();
+		Query query = queryLoader.getQuery((String) templateSource);
+		if(query == null) {
+			logger.warn("can't find {}", templateSource);
+			return -1;
+		}
+		return query.getLastModified();
 	}
 
 	@Override

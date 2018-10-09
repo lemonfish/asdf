@@ -9,9 +9,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.ReflectionUtils.FieldFilter;
+
 public class SessionVariables {
 
-	public static final String SESSION_KEY = "BILLPOST_SESSION";
+	public static final String SESSION_KEY = "APP_SESSION";
 
 	private static final ThreadLocal<Map<String, Object>> VARIABLES = new ThreadLocal<Map<String, Object>>() {
 		@Override
@@ -31,6 +34,9 @@ public class SessionVariables {
 
 	public static boolean isDirty() {
 		Map<String, Object> map = VARIABLES.get();
+		if(map.isEmpty()) {
+			return false;
+		}
 		return (boolean) map.get("isDirty");
 	}
 
@@ -44,6 +50,9 @@ public class SessionVariables {
 	}
 
 	public static void popuplate(HttpSession nativeSession) {
+		if(nativeSession == null) {
+			return;
+		}
 		Map<String,Object> map = VARIABLES.get();
 
 		NATIVESESSION.set(nativeSession);
@@ -96,19 +105,27 @@ public class SessionVariables {
 		map.put(variable, value);
 	}
 
+	public static HttpSession getNative() {
+		return NATIVESESSION.get();
+	}
+
 	public static void set(SessionModel sessionModel) {
 		Map<String,Object> map = VARIABLES.get();
-		for (Field field : sessionModel.getClass().getDeclaredFields()) {
-			if (field.isAnnotationPresent(SessionProperty.class)) {
-				field.setAccessible(true);
-				try {
-					map.put(field.getName(), field.get(sessionModel));
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					e.printStackTrace();
-					map.put(field.getName(), null);
-				}
+		ReflectionUtils.doWithFields(sessionModel.getClass(), field ->{
+			field.setAccessible(true);
+			try {
+				map.put(field.getName(), field.get(sessionModel));
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				e.printStackTrace();
+				map.put(field.getName(), null);
 			}
-		}
+		}, new FieldFilter() {
+			@Override
+			public boolean matches(Field field) {
+				return field.isAnnotationPresent(SessionProperty.class);
+			}
+		});
+
 		map.put("isDirty", true);
 	}
 

@@ -6,7 +6,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Component;
 
 import net.asdf.core.model.Model;
@@ -15,7 +16,7 @@ import net.asdf.core.query.CommonQueryExecutor;
 @Component
 public class DefaultSelectDao implements Dao {
 
-	@Autowired
+	@Resource
 	private CommonQueryExecutor queryExecutor;
 
 	@Override

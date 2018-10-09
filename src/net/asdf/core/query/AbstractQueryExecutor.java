@@ -2,12 +2,18 @@
 
 package net.asdf.core.query;
 
+import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -15,12 +21,12 @@ import net.asdf.core.model.Model;
 import net.asdf.core.query.template.QueryTemplateEngine;
 import net.asdf.core.query.template.TemplateResult;
 
-public class AbstractQueryExecutor implements QueryExecutor {
+public class AbstractQueryExecutor implements QueryExecutor, InitializingBean {
 
-	@Autowired
+	@Resource
 	protected QueryTemplateEngine templateEngine;
 
-	@Autowired
+	@Resource
 	protected DataSource dataSource;
 
 	@Value("#{config['query.databasetype'] ?: 'oracle'}")
@@ -29,7 +35,13 @@ public class AbstractQueryExecutor implements QueryExecutor {
 	@Resource(name="defaultNamedParameterJdbcTemplate")
 	protected NamedParameterJdbcTemplate defaultNamedParameterJdbcTemplate;
 
-	protected CamelCaseMapRowMapper camelCaseMapRowMapper = new CamelCaseMapRowMapper();
+
+	@Autowired(required=false)
+	@Qualifier("defaultRowMapper")
+	private RowMapper<Map<String, Object>> rowMapper;
+
+	@Resource
+	private ConversionService conversionService;
 
 	@Override
 	public void setTemplateEngine(QueryTemplateEngine templateEngine) {
@@ -85,8 +97,24 @@ public class AbstractQueryExecutor implements QueryExecutor {
 
 	/* TODO RowMapper를 캐싱해야 하는지 판단하려면 성능에 미치는 영향을 알아야 하는데. 뒤에 짜보자. */
 	protected <T extends Model> RowMapper<T> getRowMapper(Class<T> clazz) {
-		BeanPropertyRowMapper<T> rowMapper = BeanPropertyRowMapper.newInstance(clazz);
+		BeanPropertyRowMapper<T> o = BeanPropertyRowMapper.newInstance(clazz);
+		o.setConversionService(conversionService);
+		return o;
+	}
+
+	public RowMapper<Map<String, Object>> getRowMapper() {
 		return rowMapper;
+	}
+
+	public void setRowMapper(RowMapper<Map<String, Object>> rowMapper) {
+		this.rowMapper = rowMapper;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if(this.rowMapper == null) {
+			 this.rowMapper = new ColumnMapRowMapper();
+		}
 	}
 
 }

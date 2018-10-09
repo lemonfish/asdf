@@ -1,6 +1,3 @@
-
-
-
 package net.asdf.core.query.template.freemarker;
 
 import java.io.IOException;
@@ -12,17 +9,19 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.ReflectionUtils.FieldFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,10 +40,12 @@ import net.asdf.core.event.ReloadEvent;
 import net.asdf.core.exception.SysException;
 import net.asdf.core.model.Model;
 import net.asdf.core.model.annotation.GenKey;
+import net.asdf.core.query.CombinedSqlParameterSource;
 import net.asdf.core.query.Query;
 import net.asdf.core.query.SqlParameterSourceBuilder;
 import net.asdf.core.query.template.QueryTemplateEngine;
 import net.asdf.core.query.template.TemplateResult;
+import net.asdf.core.util.Mapz;
 import net.asdf.core.web.SessionVariables;
 
 @Component
@@ -65,10 +66,10 @@ public class FreeMarkerQueryTemplateEngine implements QueryTemplateEngine{
 	@Value("#{config_template['encoding.output' ?: 'UTF-8']}")
 	private String outputEncoding;
 
-	@Autowired
+	@Resource
 	private List<FreeMarkerQueryTool> queryToolList;
 
-	@Autowired
+	@Resource
 	private List<DynamicVariableAwareTool> dynamicVariableAwareToolList;
 
 	private ObjectMapper mapper;
@@ -77,34 +78,38 @@ public class FreeMarkerQueryTemplateEngine implements QueryTemplateEngine{
 
 	private Map<String,TemplateMethodModelEx> toolContext;
 
-	@Autowired
-	private FreeMarkerQueryLoader queryLoader;
+	@Resource
+	private FreeMarkerQueryLoader freeMarkerQueryLoader;
 
-	@Autowired
+	@Resource
 	private SqlParameterSourceBuilder sqlParameterSourceBuilder;
 
 	@Override
 	@PostConstruct
 	public void init() {
 
-		conf = new Configuration(Configuration.VERSION_2_3_26);
+		conf = new Configuration(Configuration.VERSION_2_3_28);
 		conf.setDefaultEncoding(this.inputEncoding);
 		conf.setOutputEncoding(this.outputEncoding);
+
+		/* NOTE 로케일에 따라 다른 템플릿 파일 찾지 안도록 */
 		conf.setLocalizedLookup(false);
 		conf.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-		DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_26);
+		DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_28);
 		builder.setForceLegacyNonListCollections(false);
 		builder.setIterableSupport(true);
 		builder.setDefaultDateType(TemplateDateModel.DATETIME);
 		conf.setObjectWrapper(builder.build());
-		conf.setTemplateLoader(queryLoader);
+		conf.setTemplateLoader(freeMarkerQueryLoader);
 
 		mapper = new ObjectMapper();
 
 		if(!queryToolList.isEmpty()) {
 			toolContext = new HashMap<>(queryToolList.size());
 			for(FreeMarkerQueryTool tool : queryToolList) {
-				toolContext.put(tool.getName(), tool);
+				for(String toolName : tool.getNames()) {
+					toolContext.put(toolName, tool);
+				}
 			}
 		}
 	}
@@ -151,7 +156,7 @@ public class FreeMarkerQueryTemplateEngine implements QueryTemplateEngine{
 
 
 		try{
-			/* TODO StringBuilderWriter를 풀링하는게 좋겠다 */
+			/* TODO StringBuilderWriter를 풀링하는게 좋겠다. JDK에 있는 StringWriter는 내부적으로 StringBuffer를 쓴다. */
 			StringBuilderWriter writer = new StringBuilderWriter(sql.length());
 
 			Template tpl = conf.getTemplate(sql);
@@ -159,35 +164,46 @@ public class FreeMarkerQueryTemplateEngine implements QueryTemplateEngine{
 
 			templateResult.setSql(writer.toString());
 
-			dynamicVariableMap.putAll(userContextMap);
-			dynamicVariableMap.putAll(sessionContextMap);
+			if(userContextMap.containsKey("__model__")) {
+				dynamicVariableMap.putAll(sessionContextMap);
+				templateResult.setSqlParameterSource(new CombinedSqlParameterSource(sqlParameterSourceBuilder.build(dynamicVariableMap), sqlParameterSourceBuilder.build(userContextMap.get("__model__"))));
+			}else {
+				dynamicVariableMap.putAll(userContextMap);
+				dynamicVariableMap.putAll(sessionContextMap);
+				templateResult.setSqlParameterSource(sqlParameterSourceBuilder.build(dynamicVariableMap));
+			}
 
-			templateResult.setSqlParameterSource(sqlParameterSourceBuilder.build(dynamicVariableMap));
-
-			logger.debug("{} result :\n{}\n{}", sql, templateResult.getSql(), templateResult.getSqlParameterSource());
+			logger.debug("{} result :\n{}\n", sql, templateResult.getSql());
 
 			if(getKey) {
 
 				Map<String, String> generatedColumnMap = new HashMap<>();
 				if (param != null && Model.class.isAssignableFrom(param.getClass())) {
 
-					for (Field field : param.getClass().getDeclaredFields()) {
-						if (field.isAnnotationPresent(GenKey.class)) {
-							GenKey genKey = field.getAnnotation(GenKey.class);
-							if (StringUtils.isBlank(genKey.column)) {
-								/* TODO 자동으로 컬럼명 생성할때 규칙을 좀 손봐야 하겠는데? */
-								generatedColumnMap.put(field.getName().replaceAll("(.)([A-Z])", "$1_$2").toUpperCase(),
-										field.getName());
-							} else {
-								generatedColumnMap.put(genKey.column, field.getName());
-							}
+					ReflectionUtils.doWithFields(param.getClass(), field->{
+						GenKey genKey = field.getAnnotation(GenKey.class);
+						if(logger.isDebugEnabled()) {
+							logger.debug("GenKey detected {}", field.getName());
 						}
+						if (StringUtils.isBlank(genKey.column())) {
+							/* TODO 자동으로 컬럼명 생성할때 규칙을 좀 손봐야 하겠는데? */
+							generatedColumnMap.put(field.getName().replaceAll("(.)([A-Z])", "$1_$2").toUpperCase(),
+									field.getName());
 
-					}
+							logger.debug("GenKey parsed {} {}", field.getName().replaceAll("(.)([A-Z])", "$1_$2").toUpperCase(), field.getName());
+						} else {
+							generatedColumnMap.put(genKey.column(), field.getName());
+							logger.debug("GenKey parsed {} {}", genKey.column(), field.getName());
+						}
+					}, new FieldFilter() {
+						@Override
+						public boolean matches(Field field) {
+							return field.isAnnotationPresent(GenKey.class);
+						}
+					});
 					if (!generatedColumnMap.isEmpty()) {
 						templateResult.setGeneratedKeyColumnMap(generatedColumnMap);
 					}
-
 				}
 			}
 		} catch (TemplateNotFoundException e) {
@@ -216,6 +232,8 @@ public class FreeMarkerQueryTemplateEngine implements QueryTemplateEngine{
 
 		if (!SessionVariables.getMap().isEmpty()) {
 			sessionContextMap.put(sessionPrefix, SessionVariables.getMap());
+		}else {
+			sessionContextMap.put(sessionPrefix, Mapz.map("사용자아이디", "anonymous", "사용자명", "익명사용자"));
 		}
 
 		return sessionContextMap;
@@ -246,6 +264,7 @@ public class FreeMarkerQueryTemplateEngine implements QueryTemplateEngine{
 			userContextMap = (Map<String, Object>) param;
 		} else if (Model.class.isAssignableFrom(clazz)) {
 			userContextMap = mapper.convertValue(param, Map.class);
+			userContextMap.put("__model__", param);
 		} else {
 			throw new SysException("지원하지 않는 유형의 파라미터입니다. : { %s }", clazz.getCanonicalName());
 		}
@@ -276,11 +295,11 @@ public class FreeMarkerQueryTemplateEngine implements QueryTemplateEngine{
 
 
 	public FreeMarkerQueryLoader getQueryLoader() {
-		return queryLoader;
+		return freeMarkerQueryLoader;
 	}
 
-	public void setQueryLoader(FreeMarkerQueryLoader queryLoader) {
-		this.queryLoader = queryLoader;
+	public void setQueryLoader(FreeMarkerQueryLoader freeMarkerQueryLoader) {
+		this.freeMarkerQueryLoader = freeMarkerQueryLoader;
 	}
 
 

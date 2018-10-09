@@ -55,9 +55,11 @@ public class Din implements FreeMarkerQueryTool, DynamicVariableAwareTool {
 
 	private ThreadLocal<Map<String, Object>> dynamicVariableMap = new ThreadLocal<Map<String,Object>>();
 
+	private String[] names = new String[] {"din"};
+
 	@Override
-	public String getName() {
-		return "din";
+	public String[] getNames() {
+		return names;
 	}
 
 	@Override

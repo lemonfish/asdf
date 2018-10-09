@@ -366,7 +366,7 @@ public interface CommonDao {
 	 * @return
 	 * @see net.asdf.core.data.DefaultSelectDao#list(java.lang.String, net.asdf.core.model.Model, java.lang.Class, int, int)
 	 */
-	<T extends Model, S extends Model> List<S> list(String sql, T param, Class<S> clazz, int fetchSize, int maxRows);
+	<S extends Model> List<S> list(String sql, Model param, Class<S> clazz, int fetchSize, int maxRows);
 
 	/**
 	 * @param sql
@@ -376,7 +376,7 @@ public interface CommonDao {
 	 * @return
 	 * @see net.asdf.core.data.DefaultSelectDao#list(java.lang.String, net.asdf.core.model.Model, java.lang.Class, int)
 	 */
-	<T extends Model, S extends Model> List<S> list(String sql, T param, Class<S> clazz, int fetchSize);
+	<S extends Model> List<S> list(String sql, Model param, Class<S> clazz, int fetchSize);
 
 	/**
 	 * @param sql
@@ -386,7 +386,7 @@ public interface CommonDao {
 	 * @return
 	 * @see net.asdf.core.data.DefaultSelectDao#list(java.lang.String, net.asdf.core.model.Model, int, int)
 	 */
-	<T extends Model> List<Map<String, Object>> list(String sql, T param, int fetchSize, int maxRows);
+	List<Map<String, Object>> list(String sql, Model param, int fetchSize, int maxRows);
 
 	/**
 	 * @param sql
@@ -395,7 +395,7 @@ public interface CommonDao {
 	 * @return
 	 * @see net.asdf.core.data.DefaultSelectDao#list(java.lang.String, net.asdf.core.model.Model, int)
 	 */
-	<T extends Model> List<Map<String, Object>> list(String sql, T param, int fetchSize);
+	List<Map<String, Object>> list(String sql, Model param, int fetchSize);
 
 	/**
 	 * @param sql
@@ -444,7 +444,7 @@ public interface CommonDao {
 	 * @return
 	 * @see net.asdf.core.data.DefaultSelectDao#list(java.lang.String, net.asdf.core.model.Model, java.lang.Class)
 	 */
-	<T extends Model, S extends Model> List<S> list(String sql, T param, Class<S> clazz);
+	<S extends Model> List<S> list(String sql, Model param, Class<S> clazz);
 
 	/**
 	 * @param sql
@@ -454,14 +454,14 @@ public interface CommonDao {
 	 * @see net.asdf.core.data.DefaultSelectDao#list(java.lang.String, java.util.Map, java.lang.Class)
 	 */
 	<T extends Model> List<T> list(String sql, Map<String, Object> param, Class<T> clazz);
-
+	
 	/**
 	 * @param sql
 	 * @param param
 	 * @return
 	 * @see net.asdf.core.data.DefaultSelectDao#list(java.lang.String, net.asdf.core.model.Model)
 	 */
-	<T extends Model> List<Map<String, Object>> list(String sql, T param);
+	List<Map<String, Object>> list(String sql, Model param);
 
 	/**
 	 * @param sql

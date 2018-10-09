@@ -31,41 +31,36 @@ public class SessionVariablesInterceptor implements HandlerInterceptor {
 
 		HandlerMethod hm = (HandlerMethod)handler;
 
-		Boolean isClassUseSession = null;
-		Boolean isMethodUseSession = null;
+		boolean useSession = false;
+		boolean createSession = false;
 
 		Class<?> klazz = hm.getBeanType();
 		if(klazz.isAnnotationPresent(Session.class)) {
-			isClassUseSession = true;
-		} else if(klazz.isAnnotationPresent(NoSession.class)) {
-			isClassUseSession = false;
+			createSession = klazz.getAnnotation(Session.class).value();
+			useSession = true;
 		}
 
 		Method m = hm.getMethod();
 		if(m.isAnnotationPresent(Session.class)) {
-			isMethodUseSession = true;
+			useSession = true;
+			createSession = m.getAnnotation(Session.class).value();
 		}else if(m.isAnnotationPresent(NoSession.class)) {
-			isMethodUseSession = false;
+			useSession = false;
 		}
 
-		boolean isNeedSession = false;
-
-		if(isMethodUseSession != null) {
-			if(isMethodUseSession) {
-				isNeedSession = true;
-			}
-		}else if(isClassUseSession != null){
-			if(isClassUseSession) {
-				isNeedSession = true;
-			}
-		}
-		if(isNeedSession) {
-			HttpSession nativeSession = request.getSession();
+		if(useSession) {
+			HttpSession nativeSession = request.getSession(false);
 			if(nativeSession == null) {
-				nativeSession = request.getSession(true);
-				logger.info("session created : {} {}", request.getRemoteAddr(), nativeSession.getId());
+
+				if(createSession) {
+					nativeSession = request.getSession();
+					logger.debug("@Session 세션이 없어서 생성함 : {} {}", request.getRemoteAddr(), nativeSession.getId());
+				}else {
+					logger.debug("@Session 세션이 없지만 생성안함");
+				}
+
 			}else {
-				logger.debug("session already exists : {} {} {}", request.getRemoteAddr(), nativeSession.getId(), nativeSession.getMaxInactiveInterval());
+				logger.debug("@Session 기존 세션 반환 : {} {} {}", request.getRemoteAddr(), nativeSession.getId(), nativeSession.getMaxInactiveInterval());
 			}
 			SessionVariables.popuplate(nativeSession);
 			request.setAttribute("_USESESSION_", true);

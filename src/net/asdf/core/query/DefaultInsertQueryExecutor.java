@@ -62,7 +62,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 		TemplateResult tr = createQuery(sql, value);
 
 		Map<String, Object> keys = null;
-		keys = this.defaultNamedParameterJdbcTemplate.queryForObject(tr.getSql(), tr.getSqlParameterSource(), this.camelCaseMapRowMapper);
+		keys = this.defaultNamedParameterJdbcTemplate.queryForObject(tr.getSql(), tr.getSqlParameterSource(), getRowMapper());
 
 		if(output != null && keys != null) {
 			output.putAll(keys);
@@ -127,14 +127,38 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
 					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
+					for(String key : returnMap.keySet()) {
+						returnMap.put(result.getGeneratedKeyPropertyName(key), returnMap.remove(key));
+					}
 				}else {
 					throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
 				}
 			break;
+			case "mysql":
+			case "mariadb":
+				if(result.hasGenKey() && result.getGeneratedKeyColumns().length == 1) {
+					KeyHolder keyHolder = new GeneratedKeyHolder();
+					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					returnMap = keyHolder.getKeys();
+					for(String key : returnMap.keySet()) {
+						returnMap.put(result.getGeneratedKeyPropertyName(result.getGeneratedKeyColumns()[0]), returnMap.remove(key));
+					}
+				}else {
+					if(!result.hasGenKey()) {
+						throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
+					}
+					if(result.getGeneratedKeyColumns().length > 1) {
+						throw new FrameworkException("MySQL, MariaDB는 단일 키 반환만을 지원합니다.");
+					}
+				}
+			break;
 
 			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), this.camelCaseMapRowMapper);
+				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+			break;
 
+			default:
+				throw new UnsupportedOperationException("지원하지 않는 유형의 데이터베이스입니다: " + databaseType);
 		}
 
 		//BeanWrapper beanWrapper = PropertyAccessorFactory.forDirectFieldAccess(param);
@@ -162,14 +186,39 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
 					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
+					for(String key : returnMap.keySet()) {
+						returnMap.put(result.getGeneratedKeyPropertyName(key), returnMap.remove(key));
+					}
 				}else {
 					throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
 				}
 			break;
 
-			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), this.camelCaseMapRowMapper);
+			case "mysql":
+			case "mariadb":
+				if(result.hasGenKey() && result.getGeneratedKeyColumns().length == 1) {
+					KeyHolder keyHolder = new GeneratedKeyHolder();
+					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					returnMap = keyHolder.getKeys();
+					for(String key : returnMap.keySet()) {
+						returnMap.put(result.getGeneratedKeyPropertyName(result.getGeneratedKeyColumns()[0]), returnMap.remove(key));
+					}
+				}else {
+					if(!result.hasGenKey()) {
+						throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
+					}
+					if(result.getGeneratedKeyColumns().length > 1) {
+						throw new FrameworkException("MySQL, MariaDB는 단일 키 반환만을 지원합니다.");
+					}
+				}
+			break;
 
+			case "sqlserver":
+				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+			break;
+
+			default:
+				throw new UnsupportedOperationException("지원하지 않는 유형의 데이터베이스입니다: " + databaseType);
 		}
 
 		if(output != null) {
@@ -193,18 +242,43 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 		 */
 		switch(databaseType) {
 			case "oracle":
-				if(result.hasGenKey()) {
+				if(outColumns != null && outColumns.length > 0) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
 					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
+					for(String key : returnMap.keySet()) {
+						returnMap.put(key, returnMap.remove(key));
+					}
 				}else {
 					throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
 				}
 			break;
 
-			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), this.camelCaseMapRowMapper);
+			case "mysql":
+			case "mariadb":
+				if(outColumns != null && outColumns.length == 1) {
+					KeyHolder keyHolder = new GeneratedKeyHolder();
+					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					returnMap = keyHolder.getKeys();
+					for(String key : returnMap.keySet()) {
+						returnMap.put(key, returnMap.remove(key));
+					}
+				}else {
+					if(outColumns == null) {
+						throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
+					}
+					if(outColumns.length > 1) {
+						throw new FrameworkException("MySQL, MariaDB는 단일 키 반환만을 지원합니다.");
+					}
+				}
+			break;
 
+			case "sqlserver":
+				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+			break;
+
+			default:
+				throw new UnsupportedOperationException("지원하지 않는 유형의 데이터베이스입니다: " + databaseType);
 		}
 
 		if(output != null) {
@@ -232,14 +306,39 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
 					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
+					for(String key : returnMap.keySet()) {
+						returnMap.put(key, returnMap.remove(key));
+					}
 				}else {
 					throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
 				}
 			break;
 
-			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), this.camelCaseMapRowMapper);
+			case "mysql":
+			case "mariadb":
+				if(outColumns != null && outColumns.length == 1) {
+					KeyHolder keyHolder = new GeneratedKeyHolder();
+					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					returnMap = keyHolder.getKeys();
+					for(String key : returnMap.keySet()) {
+						returnMap.put(key, returnMap.remove(key));
+					}
+				}else {
+					if(outColumns == null) {
+						throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
+					}
+					if(outColumns.length > 1) {
+						throw new FrameworkException("MySQL, MariaDB는 단일 키 반환만을 지원합니다.");
+					}
+				}
+			break;
 
+			case "sqlserver":
+				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+				break;
+
+			default:
+				throw new UnsupportedOperationException("지원하지 않는 유형의 데이터베이스입니다: " + databaseType);
 		}
 
 		param.putAll(returnMap);
@@ -265,14 +364,39 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
 					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
+					for(String key : returnMap.keySet()) {
+						returnMap.put(key, returnMap.remove(key));
+					}
 				}else {
 					throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
 				}
 			break;
 
-			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), this.camelCaseMapRowMapper);
+			case "mysql":
+			case "mariadb":
+				if(outColumns != null && outColumns.length == 1) {
+					KeyHolder keyHolder = new GeneratedKeyHolder();
+					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					returnMap = keyHolder.getKeys();
+					for(String key : returnMap.keySet()) {
+						returnMap.put(key, returnMap.remove(key));
+					}
+				}else {
+					if(outColumns == null) {
+						throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
+					}
+					if(outColumns.length > 1) {
+						throw new FrameworkException("MySQL, MariaDB는 단일 키 반환만을 지원합니다.");
+					}
+				}
+			break;
 
+			case "sqlserver":
+				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+			break;
+
+			default:
+				throw new UnsupportedOperationException("지원하지 않는 유형의 데이터베이스입니다: " + databaseType);
 		}
 
 		if(output != null) {
@@ -295,15 +419,11 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 		 * SQL Server의 경우 INSERT문의 OUTPUT절에서 반환되는 값을 추출한다.
 		 */
 
-		if("oracle".equals(databaseType)) {
+		if(!"sqlserver".equals(databaseType)) {
 			throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
 		}
 
-		switch(databaseType) {
-			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), this.camelCaseMapRowMapper);
-			break;
-		}
+		returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 
 		if(param != null) {
 			param.putAll(returnMap);

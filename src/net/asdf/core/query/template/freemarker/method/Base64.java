@@ -14,9 +14,11 @@ import net.asdf.core.query.template.freemarker.FreeMarkerViewTool;
 @Component
 public class Base64 implements FreeMarkerViewTool {
 
+	private String[] names = new String[] {"base64"};
+
 	@Override
-	public String getName() {
-		return "base64";
+	public String[] getNames() {
+		return names;
 	}
 
 	@Override

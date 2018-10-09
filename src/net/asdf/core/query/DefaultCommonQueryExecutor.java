@@ -6,9 +6,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import net.asdf.core.model.Model;
@@ -24,13 +25,13 @@ public class DefaultCommonQueryExecutor implements CommonQueryExecutor {
 
 	private Logger logger = LogManager.getLogger(this.getClass());
 
-	@Autowired
+	@Resource
 	private DefaultInsertQueryExecutor c;
 
-	@Autowired
+	@Resource
 	private DefaultSelectQueryExecutor r;
 
-	@Autowired
+	@Resource
 	private DefaultUpldateQueryExecutor u;
 
 	/**

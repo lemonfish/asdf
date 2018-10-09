@@ -36,9 +36,11 @@ public class Uuid implements FreeMarkerQueryTool, DynamicVariableAwareTool{
 		this.dynamicVariableMap.set(dynamicVariableMap);
 	}
 
+	private String[] names = new String[] {"uuid"};
+
 	@Override
-	public String getName() {
-		return "uuid";
+	public String[] getNames() {
+		return names;
 	}
 
 }

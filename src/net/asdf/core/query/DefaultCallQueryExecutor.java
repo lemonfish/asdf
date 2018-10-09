@@ -17,6 +17,7 @@ public class DefaultCallQueryExecutor extends AbstractQueryExecutor {
 	 * @param paramMap
 	 */
 	public <T extends Map<String, ?>> void call(String sql, T paramMap) {
+		/* TODO 구현해야 함 */
 		TemplateResult result = createQuery(sql, paramMap);
 
 	}

@@ -26,7 +26,7 @@ public class DefaultSelectQueryExecutor extends AbstractQueryExecutor {
 
 	public Map<String,Object> one(String sql){
 		TemplateResult result = createQuery(sql);
-		return this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), this.camelCaseMapRowMapper);
+		return this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 	}
 
 	public <T extends Model> T one(String sql, Class<T> clazz) {
@@ -36,7 +36,7 @@ public class DefaultSelectQueryExecutor extends AbstractQueryExecutor {
 
 	private Map<String, Object> oneByPrimitive(String sql, Object value){
 		TemplateResult result = createQuery(sql, value);
-		return this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), this.camelCaseMapRowMapper);
+		return this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 	}
 
 	private <T extends Model> T oneByPrimitive(String sql, Object value, Class<T> clazz){
@@ -94,7 +94,7 @@ public class DefaultSelectQueryExecutor extends AbstractQueryExecutor {
 
 	public <T extends Model> Map<String, Object> one(String sql, T param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), this.camelCaseMapRowMapper);
+		return this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 	}
 
 	public <T extends Model, S extends Model> S one(String sql, T param, Class<S> clazz) {
@@ -104,7 +104,7 @@ public class DefaultSelectQueryExecutor extends AbstractQueryExecutor {
 
 	public Map<String, Object> one(String sql, Map<String, Object> param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), this.camelCaseMapRowMapper);
+		return this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 	}
 
 
@@ -148,7 +148,7 @@ public class DefaultSelectQueryExecutor extends AbstractQueryExecutor {
 
 	public List<Map<String, Object>> list(String sql) {
 		TemplateResult result = createQuery(sql);
-		return this.defaultNamedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), camelCaseMapRowMapper);
+		return this.defaultNamedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 	}
 
 	public <T extends Model> List<T> list(String sql, Class<T> clazz) {
@@ -158,7 +158,7 @@ public class DefaultSelectQueryExecutor extends AbstractQueryExecutor {
 
 	private List<Map<String, Object>> listByPrimitive(String sql, Object value){
 		TemplateResult result = createQuery(sql, value);
-		return this.defaultNamedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), camelCaseMapRowMapper);
+		return this.defaultNamedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 	}
 
 
@@ -218,12 +218,12 @@ public class DefaultSelectQueryExecutor extends AbstractQueryExecutor {
 
 	public List<Map<String, Object>> list(String sql, Map<String, Object> param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), camelCaseMapRowMapper);
+		return this.defaultNamedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 	}
 
 	public <T extends Model> List<Map<String, Object>> list(String sql, T param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), camelCaseMapRowMapper);
+		return this.defaultNamedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 	}
 
 	public <T extends Model> List<T> list(String sql, Map<String, Object> param, Class<T> clazz) {
@@ -246,7 +246,7 @@ public class DefaultSelectQueryExecutor extends AbstractQueryExecutor {
 		jdbcTemplate.setFetchSize(fetchSize == -1 ? defaultFetchSize : fetchSize);
 		jdbcTemplate.setMaxRows(maxRows == -1 ? defaultMaxRows : maxRows);
 		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-		return namedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), camelCaseMapRowMapper);
+		return namedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 	}
 
 	public <T extends Model> List<T> list(String sql, Map<String, Object> param, Class<T> clazz, int fetchSize) {
@@ -272,7 +272,7 @@ public class DefaultSelectQueryExecutor extends AbstractQueryExecutor {
 		jdbcTemplate.setFetchSize(fetchSize == -1 ? defaultFetchSize : fetchSize);
 		jdbcTemplate.setMaxRows(maxRows == -1 ? defaultMaxRows : maxRows);
 		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-		return namedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), camelCaseMapRowMapper);
+		return namedParameterJdbcTemplate.query(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 	}
 
 	public <T extends Model, S extends Model> List<S> list(String sql, T param, Class<S> clazz, int fetchSize) {

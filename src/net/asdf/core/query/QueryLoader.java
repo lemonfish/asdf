@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,6 @@ import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.boon.Boon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,7 +31,10 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import net.asdf.core.event.QueryReloadEvent;
+import net.asdf.core.util.Objectz;
 
 @Component
 public class QueryLoader {
@@ -62,8 +65,11 @@ public class QueryLoader {
 	private ReadLock rlock = rwlock.readLock();
 	private WriteLock wlock = rwlock.writeLock();
 
+	private Resource[] systemResources;
+	private Resource[] userResources;
 	private Resource[] resources;
 
+	/* NOTE {@literal @}Resource는 생성자 주입을 지원 안하네... */
 	@Autowired
 	public QueryLoader(ApplicationEventPublisher eventPublisher) {
 		this.eventPublisher = eventPublisher;
@@ -99,8 +105,8 @@ public class QueryLoader {
 		return query;
 	}
 
-	public String dump() {
-		return Boon.toPrettyJson(queryMap);
+	public String dump() throws JsonProcessingException {
+		return Objectz.toJson(queryMap);
 	}
 
 	@Scheduled(fixedDelay = 5 * 1000)
@@ -111,6 +117,10 @@ public class QueryLoader {
 		if (resources.length > 0) {
 			try {
 				for (Resource resource : resources) {
+					if(!resource.exists()) {
+						logger.warn("모니터링 대상이 갑자기 사라졌네? {}", resource.getFilename());
+						continue;
+					}
 					long lastModified = resource.lastModified();
 					if (logger.isTraceEnabled()) {
 						logger.trace("check {} - {} - {}", resource.getFilename(), lastModified,
@@ -142,13 +152,52 @@ public class QueryLoader {
 
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-		this.resources = resolver.getResources(this.pattern);
+		this.systemResources = resolver.getResources("net/asdf/common/**/*.ssql");
+
+		String[] patterns = this.pattern.split(",");
+
+		ArrayList<Resource> userResourceArray = new ArrayList<Resource>(this.pattern.length() * 20);
+
+		for (int i = 0; i < patterns.length; i++) {
+			Collections.addAll(userResourceArray, resolver.getResources(patterns[i].trim().replace(".", "/") + "/**/*.ssql"));
+		}
+
+		userResourceArray.sort(new Comparator<Resource>() {
+			@Override
+			public int compare(Resource o1, Resource o2) {
+				boolean isAuto1 = o1.getFilename().matches(".*_자동\\.ssql");
+				boolean isAuto2 = o2.getFilename().matches(".*_자동\\.ssql");
+				if(isAuto1 == isAuto2) {
+					return 0;
+				}else if(isAuto1) {
+					return -1;
+				}else {
+					return 1;
+				}
+			}
+		});
+
+
+		this.userResources = new Resource[userResourceArray.size()];
+		userResourceArray.toArray(this.userResources);
+		userResourceArray = null;
+
+
+		this.resources = new Resource[this.systemResources.length + this.userResources.length];
+
+		System.arraycopy(this.systemResources, 0, this.resources, 0, this.systemResources.length);
+		System.arraycopy(this.userResources, 0, this.resources, this.systemResources.length, this.userResources.length);
+
 
 		logger.info("query loader init start");
 
+		/* TODO 자동 생성된 쿼리를 먼저 로딩하고 사용자가 작성한 쿼리를 로딩해야 한다.
+		 * 그래야 자동 생성된 쿼리의 덮어쓰기가 가능.
+		 */
 		for (Resource resource : resources) {
 			load(resource);
 		}
+
 
 		logger.info("query loader init end");
 
@@ -156,6 +205,9 @@ public class QueryLoader {
 
 	public void load(Resource resource) throws UnsupportedEncodingException, IOException {
 
+		if(logger.isDebugEnabled()) {
+			logger.debug("load {}", resource.getFilename());
+		}
 
 		String resourceURI = resource.getURI().toString();
 		String queryId = null;
@@ -218,8 +270,8 @@ public class QueryLoader {
 		}
 	}
 
-	private void fireQueryReloadEvent(List<String> reloadedQueryIds) {
-		this.eventPublisher.publishEvent(new QueryReloadEvent(reloadedQueryIds));
+	private void fireQueryReloadEvent(List<String> unmodifiableReloadedQueryIds) {
+		this.eventPublisher.publishEvent(new QueryReloadEvent(unmodifiableReloadedQueryIds));
 	}
 
 

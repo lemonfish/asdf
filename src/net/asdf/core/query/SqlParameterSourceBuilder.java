@@ -1,15 +1,26 @@
 
 package net.asdf.core.query;
 
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.jdbc.core.namedparam.EmptySqlParameterSource;
@@ -17,9 +28,17 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.asdf.core.exception.SysException;
 import net.asdf.core.model.Model;
+import net.asdf.core.model.annotation.Json;
+import net.asdf.core.security.CipherService;
+import net.asdf.core.security.Password;
+import net.asdf.core.security.PrivateInfo;
 
 
 @Component
@@ -30,6 +49,11 @@ public class SqlParameterSourceBuilder {
     @Value("#{config_template['singlevaluename' ?: 'value']}")
     private String singleValueName = "value";
 
+    @Autowired
+    private CipherService cipherService;
+
+    @Resource
+    private ObjectMapper mapper;
 
 	/**
 	 * 쿼리 실행 시 사용될 파라미터를 생성한다.
@@ -48,7 +72,8 @@ public class SqlParameterSourceBuilder {
 	 *            쿼리 파라미터로 변환 할 원본 파라미터
 	 * @return 쿼리 파라미터 형태로 변환된 파라미터를 지닌 SqlParameterSource
 	 */
-    public SqlParameterSource build(Object param) {
+    @SuppressWarnings("unchecked")
+	public SqlParameterSource build(Object param) {
 
         SqlParameterSource sps = null;
 
@@ -95,7 +120,7 @@ public class SqlParameterSourceBuilder {
      * @param paramMap
      * @return
      */
-    private <T extends Map<String, Object>> SqlParameterSource build(T paramMap) {
+    private SqlParameterSource build(Map<String, Object> paramMap) {
         int size = 0;
         if ((paramMap == null) || ((size = paramMap.size()) == 0)) {
             return EmptySqlParameterSource.INSTANCE;
@@ -127,8 +152,7 @@ public class SqlParameterSourceBuilder {
      * @param paramMap
      */
     private void expandMap(Map<String, Object> expandedMap, String namespacePrefix, Map<String, Object> paramMap) {
-        int size = 0;
-        if ((size = paramMap.size()) == 0) {
+        if (paramMap.size() == 0) {
             return;
         }
 
@@ -153,7 +177,8 @@ public class SqlParameterSourceBuilder {
         }
     }
 
-    private void expand(Map<String, Object> expandedMap, String name, Object value) {
+    @SuppressWarnings("unchecked")
+	private void expand(Map<String, Object> expandedMap, String name, Object value) {
         Class<?> clazz = null;
         // String과 null, Primitive, PrimitiveWrapper 유형은 값을 그대로 사용
         if ((value == null) || ClassUtils.isPrimitiveOrWrapper((clazz = value.getClass()))
@@ -179,7 +204,7 @@ public class SqlParameterSourceBuilder {
      * @param namespacePrefix
      * @param paramBean
      */
-    private void expandBean(Map<String, Object> expandedMap, String namespacePrefix, Object paramBean) {
+    private void expandBean(Map<String, Object> expandedMap, String namespacePrefix, Object paramBean)  {
         StringBuilder namespace = new StringBuilder(namespacePrefix);
         int namespaceOffset = 0;
         if (!"".equals(namespacePrefix)) {
@@ -197,8 +222,78 @@ public class SqlParameterSourceBuilder {
         };
         Set<Object> keySet = beanMap.keySet();
 
+        Class<? extends Object> klass = paramBean.getClass();
         String[] keys = keySet.toArray(new String[keySet.size()]);
         for (String key : keys) {
+
+        	Field field = null;
+			try {
+				field = ReflectionUtils.findField(klass, key);
+	        	if(field != null) {
+	        		if(field.isAnnotationPresent(Json.class)) {
+
+		        		String name = namespace.append(field.getName()).toString();
+						namespace.setLength(namespaceOffset);
+		        		Object value = null;
+		        		try {
+		        			ReflectionUtils.makeAccessible(field);
+							value = mapper.writeValueAsString(field.get(paramBean));
+						} catch (IllegalArgumentException | IllegalAccessException e) {
+							e.printStackTrace();
+						} catch (JsonProcessingException e) {
+							e.printStackTrace();
+						}finally {
+							expandedMap.put(name, value);
+						}
+		        		continue;
+	        		}else if(field.isAnnotationPresent(PrivateInfo.class)) {
+		        		String name = namespace.append(field.getName()).toString();
+		        		namespace.setLength(namespaceOffset);
+		        		Object value = null;
+		        		try {
+		        			ReflectionUtils.makeAccessible(field);
+							value = cipherService.cipher((String) field.get(paramBean));
+						} catch (IllegalArgumentException | IllegalAccessException e) {
+							e.printStackTrace();
+						} catch (InvalidKeyException e) {
+							e.printStackTrace();
+						} catch (NoSuchAlgorithmException e) {
+							e.printStackTrace();
+						} catch (NoSuchPaddingException e) {
+							e.printStackTrace();
+						} catch (InvalidAlgorithmParameterException e) {
+							e.printStackTrace();
+						} catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						} catch (IllegalBlockSizeException e) {
+							e.printStackTrace();
+						} catch (BadPaddingException e) {
+							e.printStackTrace();
+						}finally {
+							expandedMap.put(name, value);
+						}
+		        		continue;
+	        		}else if(field.isAnnotationPresent(Password.class)) {
+	        			String name = namespace.append(field.getName()).toString();
+						namespace.setLength(namespaceOffset);
+		        		Object value = null;
+		        		try {
+		        			ReflectionUtils.makeAccessible(field);
+							value = cipherService.password((String) field.get(paramBean));
+						} catch (IllegalArgumentException e) {
+							e.printStackTrace();
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+						}finally {
+							expandedMap.put(name, value);
+						}
+		        		continue;
+	        		}
+	        	}
+			} catch (SecurityException e1) {
+				e1.printStackTrace();
+			}
+
 
             String name = namespace.append(key).toString();
             namespace.setLength(namespaceOffset);

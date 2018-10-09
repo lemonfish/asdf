@@ -1,6 +1,9 @@
 
 package net.asdf.core.query;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -15,6 +18,12 @@ public class UriQueryIdGenerator implements QueryIdGenerator {
 	public String generate() {
 		ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentRequestUri();
 		builder.removePathExtension();
-		return builder.build().getPath().substring(1).replaceAll("/", ".");
+		String queryId = builder.build().getPath().substring(1).replaceAll("/", ".");
+		try {
+			queryId = URLDecoder.decode(queryId, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return queryId;
 	}
 }

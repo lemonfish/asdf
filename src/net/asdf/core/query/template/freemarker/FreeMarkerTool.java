@@ -7,7 +7,7 @@ import freemarker.template.TemplateModel;
 
 public interface FreeMarkerTool extends TemplateMethodModelEx {
 
-	public String getName();
+	public String[] getNames();
 
 	default String getValue(TemplateModel model	) {
 		return model.toString();

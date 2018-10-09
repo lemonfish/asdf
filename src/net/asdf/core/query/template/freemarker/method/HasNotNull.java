@@ -18,9 +18,11 @@ public class HasNotNull implements FreeMarkerQueryTool, FreeMarkerViewTool {
 	@Value("#{config['query.databasetype'] ?: 'oracle'}")
 	protected String databaseType;
 
+	private String[] names = new String[] {"hasNotNull", "hnn"};
+
 	@Override
-	public String getName() {
-		return "hasNotNull";
+	public String[] getNames() {
+		return names;
 	}
 	@Override
 	public Object exec(@SuppressWarnings("rawtypes") List arguments) throws TemplateModelException {
@@ -28,7 +30,7 @@ public class HasNotNull implements FreeMarkerQueryTool, FreeMarkerViewTool {
 		List<TemplateModel> models = arguments;
 		if(models.size() == 0) return TemplateBooleanModel.FALSE;
 		for(TemplateModel model : models) {
-			if(model == null) continue;
+			if(model == null || "EmptyStringAndSequenceAndHash".equals(model.getClass().getSimpleName())) continue;
 			String value = getValue(model);
 
 			if(!("".equals(value) || "undefined".equals(value))) {

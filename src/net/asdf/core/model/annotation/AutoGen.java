@@ -1,6 +1,5 @@
-package net.asdf.core.web;
+package net.asdf.core.model.annotation;
 
-import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -8,7 +7,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 @Retention(RUNTIME)
-@Target({ TYPE, METHOD })
-public @interface Session {
-	boolean value() default false;
+@Target(TYPE)
+public @interface AutoGen {
+	String 버전();
+	String 테이블명();
 }

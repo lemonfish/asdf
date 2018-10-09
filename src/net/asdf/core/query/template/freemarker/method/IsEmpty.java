@@ -15,9 +15,11 @@ import net.asdf.core.query.template.freemarker.FreeMarkerViewTool;
 @Component
 public class IsEmpty implements FreeMarkerQueryTool, FreeMarkerViewTool  {
 
+	private String[] names = new String[] {"isEmpty", "ie"};
+
 	@Override
-	public String getName() {
-		return "isEmpty";
+	public String[] getNames() {
+		return names;
 	}
 
 	@Override
@@ -26,7 +28,7 @@ public class IsEmpty implements FreeMarkerQueryTool, FreeMarkerViewTool  {
 		List<TemplateModel> models = arguments;
 		if(arguments.size() == 0) return TemplateBooleanModel.TRUE;
 		for(TemplateModel model : models) {
-			if(model == null) continue;
+			if(model == null || "EmptyStringAndSequenceAndHash".equals(model.getClass().getSimpleName())) continue;
 			String value = getValue(model);
 			if(!StringUtils.isEmpty(value) && !"undefined".contentEquals(value)) {
 				return TemplateBooleanModel.FALSE;

@@ -19,7 +19,6 @@ public class StatefullModel implements Model {
     public void setRowStatus(String rowStatus) {
         this.rowStatus = rowStatus;
     }
-
 }
 
 

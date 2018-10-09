@@ -15,9 +15,11 @@ import net.asdf.core.query.template.freemarker.FreeMarkerViewTool;
 @Component
 public class Comma implements FreeMarkerViewTool {
 
+	private String[] names = new String[] {"comma"};
+
 	@Override
-	public String getName() {
-		return "comma";
+	public String[] getNames() {
+		return names;
 	}
 
 	@Override
