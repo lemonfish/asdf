@@ -10,10 +10,10 @@ pom.xml.versionsBackup
 
 ### STS ###
 .apt_generated
-#.classpath
+.classpath
 .factorypath
-#.project
-#.settings
+.project
+.settings
 .springBeans
 .sts4-cache
 
