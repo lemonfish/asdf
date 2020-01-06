@@ -28,7 +28,7 @@ public class CipherService {
 	@Value("#{asdf['secret.key'] ?: '1234567890123456'}")
 	private String 시크릿;
 
-	@Value("#{asdf['secret.iv']} ?: '1234567890123456'}")
+	@Value("#{asdf['secret.iv'] ?: '1234567890123456'}")
 	private String 초기값;
 
 	/**

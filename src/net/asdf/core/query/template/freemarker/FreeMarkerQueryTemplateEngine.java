@@ -54,16 +54,16 @@ public class FreeMarkerQueryTemplateEngine implements QueryTemplateEngine{
 	private static Logger logger = LogManager.getLogger(FreeMarkerQueryTemplateEngine.class);
 
 
-	@Value("#{asdf['query.singlevaluename' ?: 'value']}")
+	@Value("#{asdf['query.singlevaluename'] ?: 'value'}")
 	private String singleValueName;
 
-	@Value("#{asdf['query.sessionprefix' ?: 'S']}")
+	@Value("#{asdf['query.sessionprefix'] ?: 'S'}")
 	private String sessionPrefix;
 
-	@Value("#{asdf['query.encoding.input' ?: 'UTF-8']}")
+	@Value("#{asdf['query.encoding.input'] ?: 'UTF-8'}")
 	private String inputEncoding;
 
-	@Value("#{adsf['query.encoding.output' ?: 'UTF-8']}")
+	@Value("#{adsf['query.encoding.output'] ?: 'UTF-8'}")
 	private String outputEncoding;
 
 	@Resource

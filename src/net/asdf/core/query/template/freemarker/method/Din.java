@@ -48,7 +48,7 @@ public class Din implements FreeMarkerQueryTool, DynamicVariableAwareTool {
 
 	private static Logger logger = LogManager.getLogger(Din.class);
 
-	@Value("#{asdf['query.dynamicin.maxcount' ?: 100]}")
+	@Value("#{asdf['query.dynamicin.maxcount'] ?: 100}")
 	private int maxCount;
 
 	private Pattern pattern = Pattern.compile("(?:'[^']*'|[^,])+");

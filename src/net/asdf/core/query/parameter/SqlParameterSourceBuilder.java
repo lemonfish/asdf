@@ -46,7 +46,7 @@ public class SqlParameterSourceBuilder {
 
     private Logger logger = LogManager.getLogger();
 
-    @Value("#{asdf['query.singlevaluename' ?: 'value']}")
+    @Value("#{asdf['query.singlevaluename'] ?: 'value'}")
     private String singleValueName = "value";
 
     @Autowired(required = false)
