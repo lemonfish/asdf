@@ -1,5 +1,5 @@
 
-package net.asdf.core.query;
+package net.asdf.core.query.executor;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -15,41 +15,67 @@ import net.asdf.core.exception.FrameworkException;
 import net.asdf.core.model.Model;
 import net.asdf.core.query.template.TemplateResult;
 
-@Component
-public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
+@Component("공통UPDATE쿼리실행기")
+public class DefaultUpdateQueryExecutor extends AbstractQueryExecutor implements UpdateQueryExecutor {
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#update(java.lang.String)
+	 */
+	@Override
 	public int update(String sql) {
 		TemplateResult result = createQuery(sql);
-		return this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource());
+		return this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource());
 	}
 
-
-
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#update(java.lang.String, java.lang.String)
+	 */
+	@Override
 	public int update(String sql, String param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource());
+		return this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource());
 	}
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#update(java.lang.String, java.lang.Integer)
+	 */
+	@Override
 	public int update(String sql, Integer param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource());
+		return this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource());
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#update(java.lang.String, java.lang.Long)
+	 */
+	@Override
 	public int update(String sql, Long param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource());
+		return this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource());
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#update(java.lang.String, java.lang.Float)
+	 */
+	@Override
 	public int update(String sql, Float param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource());
+		return this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource());
 	}
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#update(java.lang.String, java.lang.Double)
+	 */
+	@Override
 	public int update(String sql, Double param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource());
+		return this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource());
 	}
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#update(java.lang.String, java.math.BigDecimal)
+	 */
+	@Override
 	public int update(String sql, BigDecimal param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource());
+		return this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource());
 	}
 
 
@@ -61,7 +87,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 		TemplateResult tr = createQuery(sql, value);
 
 		Map<String, Object> keys = null;
-		keys = this.defaultNamedParameterJdbcTemplate.queryForObject(tr.getSql(), tr.getSqlParameterSource(), getRowMapper());
+		keys = this.공통명명파라미터JDBC템플릿.queryForObject(tr.getSql(), tr.getSqlParameterSource(), getRowMapper());
 
 		if(output != null && keys != null) {
 			output.putAll(keys);
@@ -72,44 +98,80 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 
 
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, java.lang.String, java.util.Map)
+	 */
+	@Override
 	public int updateAndGet(String sql, String value, Map<String, Object> output) {
 		return updateAndGetInternal(sql, value, output);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, java.lang.Integer, java.util.Map)
+	 */
+	@Override
 	public int updateAndGet(String sql, Integer value, Map<String, Object> output) {
 		return updateAndGetInternal(sql, value, output);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, java.lang.Long, java.util.Map)
+	 */
+	@Override
 	public int updateAndGet(String sql, Long value, Map<String, Object> output) {
 		return updateAndGetInternal(sql, value, output);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, java.lang.Float, java.util.Map)
+	 */
+	@Override
 	public int updateAndGet(String sql, Float value, Map<String, Object> output) {
 		return updateAndGetInternal(sql, value, output);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, java.lang.Double, java.util.Map)
+	 */
+	@Override
 	public int updateAndGet(String sql, Double value, Map<String, Object> output) {
 		return updateAndGetInternal(sql, value, output);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, java.math.BigDecimal, java.util.Map)
+	 */
+	@Override
 	public int updateAndGet(String sql, BigDecimal value, Map<String, Object> output) {
 		return updateAndGetInternal(sql, value, output);
 	}
 
 
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#update(java.lang.String, java.util.Map)
+	 */
+	@Override
 	public int update(String sql, Map<String, Object> param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource());
+		return this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource());
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#update(java.lang.String, T)
+	 */
+	@Override
 	public <T extends Model> int update(String sql, T param) {
 		TemplateResult result = createQuery(sql, param);
-		return this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource());
+		return this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource());
 	}
 
 
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, T)
+	 */
+	@Override
 	public <T extends Model> int updateAndGet(String sql, T param) {
 		TemplateResult result = createQuery(sql, param, true);
 
@@ -126,7 +188,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			case "oracle":
 				if(result.hasGenKey()) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					updatedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					updatedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(result.getGeneratedKeyPropertyName(key), returnMap.remove(key));
@@ -140,7 +202,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			case "mariadb":
 				if(result.hasGenKey() && result.getGeneratedKeyColumns().length == 1) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					updatedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					updatedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(result.getGeneratedKeyPropertyName(result.getGeneratedKeyColumns()[0]), returnMap.remove(key));
@@ -156,7 +218,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			break;
 
 			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+				returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 			break;
 
 			default:
@@ -170,6 +232,10 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 		return updatedRowCount;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, T, java.util.Map)
+	 */
+	@Override
 	public <T extends Model> int updateAndGet(String sql, T param, Map<String, Object> output) {
 		TemplateResult result = createQuery(sql, param, true);
 
@@ -186,7 +252,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			case "oracle":
 				if(result.hasGenKey()) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					updatedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					updatedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(result.getGeneratedKeyPropertyName(key), returnMap.remove(key));
@@ -200,7 +266,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			case "mariadb":
 				if(result.hasGenKey() && result.getGeneratedKeyColumns().length == 1) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					updatedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					updatedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(result.getGeneratedKeyPropertyName(result.getGeneratedKeyColumns()[0]), returnMap.remove(key));
@@ -216,7 +282,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			break;
 
 			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+				returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 			break;
 
 			default:
@@ -230,6 +296,10 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 		return updatedRowCount;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, T, java.lang.String[], java.util.Map)
+	 */
+	@Override
 	public <T extends Model> int updateAndGet(String sql, T param, String[] outColumns, Map<String, Object> output) {
 		TemplateResult result = createQuery(sql, param);
 
@@ -246,7 +316,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			case "oracle":
 				if(outColumns != null && outColumns.length > 0) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					updatedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					updatedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -260,7 +330,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			case "mariadb":
 				if(outColumns != null && outColumns.length == 1) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					updatedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					updatedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -276,7 +346,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			break;
 
 			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+				returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 			break;
 
 			default:
@@ -290,6 +360,10 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 		return updatedRowCount;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, java.util.Map, java.lang.String[])
+	 */
+	@Override
 	public int updateAndGet(String sql, Map<String, Object> param, String[] outColumns) {
 		TemplateResult result = createQuery(sql, param);
 
@@ -306,7 +380,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			case "oracle":
 				if(outColumns != null && outColumns.length > 0) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					updatedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					updatedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -320,7 +394,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			case "mariadb":
 				if(outColumns != null && outColumns.length == 1) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					updatedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					updatedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -336,7 +410,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			break;
 
 			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+				returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 			break;
 
 			default:
@@ -348,6 +422,10 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 		return updatedRowCount;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, java.util.Map, java.lang.String[], java.util.Map)
+	 */
+	@Override
 	public int updateAndGet(String sql, Map<String, Object> param, String[] outColumns, Map<String,Object> output) {
 		TemplateResult result = createQuery(sql, param);
 
@@ -364,7 +442,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			case "oracle":
 				if(outColumns != null && outColumns.length > 0) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					updatedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					updatedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -378,7 +456,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			case "mariadb":
 				if(outColumns != null && outColumns.length == 1) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					updatedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					updatedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -394,7 +472,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			break;
 
 			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+				returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 			break;
 			default:
 				throw new UnsupportedOperationException("지원하지 않는 유형의 데이터베이스입니다: " + databaseType);
@@ -409,6 +487,10 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 
 
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.UpdateQueryExecutor#updateAndGet(java.lang.String, java.util.Map)
+	 */
+	@Override
 	public int updateAndGet(String sql, Map<String, Object> param) {
 		TemplateResult result = createQuery(sql, param);
 
@@ -420,7 +502,7 @@ public class DefaultUpldateQueryExecutor extends AbstractQueryExecutor {
 			throw new FrameworkException("키를 지정하지 않은 수정쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
 		}
 
-		returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+		returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 
 		param.putAll(returnMap);
 

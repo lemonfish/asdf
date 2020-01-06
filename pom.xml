@@ -29,8 +29,8 @@
 	</build>
 
 	<dependencies>
-		<!-- JEUS 8이 servlet 3.1 까지 지원 https://technet.tmaxsoft.com/upload/download/online/jeus/pver-20170202-000001/release-note/chapter_jeus_8_0.html -->
 
+		<!-- JEUS 8이 servlet 3.1 까지 지원 https://technet.tmaxsoft.com/upload/download/online/jeus/pver-20170202-000001/release-note/chapter_jeus_8_0.html -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>

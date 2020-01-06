@@ -20,23 +20,3 @@ public class StatefullModel implements Model {
         this.rowStatus = rowStatus;
     }
 }
-
-
-
-class SampleModel extends StatefullModel {
-
-	private String name;
-
-    public SampleModel(String name, String status) {
-        this.name = name;
-        this.setRowStatus(status);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-}

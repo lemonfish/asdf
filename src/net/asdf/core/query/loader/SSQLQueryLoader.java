@@ -1,5 +1,5 @@
 
-package net.asdf.core.query;
+package net.asdf.core.query.loader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,12 +34,13 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import net.asdf.core.event.QueryReloadEvent;
+import net.asdf.core.query.Query;
 import net.asdf.core.util.Objectz;
 
-@Component
-public class QueryLoader {
+@Component("SSQL쿼리로더")
+public class SSQLQueryLoader implements QueryLoader {
 
-	private static final Logger logger = LogManager.getLogger(QueryLoader.class);
+	private static final Logger logger = LogManager.getLogger(SSQLQueryLoader.class);
 
 	private final ApplicationEventPublisher eventPublisher;
 
@@ -49,10 +50,10 @@ public class QueryLoader {
 
 	private List<String> reloadedQueryIds = new ArrayList<String>();
 
-	@Value("#{asdf['query.file.pattern']}")
+	@Value("#{asdf['query.file.pattern'] ?: 'dummy'}")
 	private String pattern;
 
-	@Value("#{asdf['query.file.encoding']}")
+	@Value("#{asdf['query.file.encoding'] ?: 'UTF-8'}")
 	private String encoding;
 
 	private Matcher blankMatcher = Pattern.compile("\\s*|^\\s*//.*").matcher("");
@@ -71,7 +72,7 @@ public class QueryLoader {
 
 	/* NOTE {@literal @}Resource는 생성자 주입을 지원 안하네... */
 	@Autowired
-	public QueryLoader(ApplicationEventPublisher eventPublisher) {
+	public SSQLQueryLoader(ApplicationEventPublisher eventPublisher) {
 		this.eventPublisher = eventPublisher;
 	}
 
@@ -83,6 +84,7 @@ public class QueryLoader {
 		this.pattern = pattern;
 	}
 
+	@Override
 	public String get(String queryId) {
 
 		rlock.lock();
@@ -94,6 +96,7 @@ public class QueryLoader {
 		return query != null ? query.getQuery() : queryId;
 	}
 
+	@Override
 	public Query getQuery(String queryId) {
 
 		rlock.lock();
@@ -117,7 +120,7 @@ public class QueryLoader {
 		if (resources.length > 0) {
 			try {
 				for (Resource resource : resources) {
-					if(!resource.exists()) {
+					if (!resource.exists()) {
 						logger.warn("모니터링 대상이 갑자기 사라졌네? {}", resource.getFilename());
 						continue;
 					}
@@ -148,18 +151,28 @@ public class QueryLoader {
 	}
 
 	@PostConstruct
-	public void init() throws IOException {
+	public void init() throws UnsupportedEncodingException, IOException {
 
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-		this.systemResources = resolver.getResources("net/asdf/common/**/*.ssql");
+		try {
+			this.systemResources = resolver.getResources("net/asdf/common/**/*.ssql");
+		}catch(IOException ioe) {
+			this.systemResources = new Resource[0];
+			logger.warn("프레임워크 공통 쿼리를 추출할 수 없음 : {}", ioe.getMessage());
+		}
 
 		String[] patterns = this.pattern.split(",");
 
 		ArrayList<Resource> userResourceArray = new ArrayList<Resource>(this.pattern.length() * 20);
 
 		for (int i = 0; i < patterns.length; i++) {
-			Collections.addAll(userResourceArray, resolver.getResources(patterns[i].trim().replace(".", "/") + "/**/*.ssql"));
+			try {
+				Resource[] resources = resolver.getResources(patterns[i].trim().replace(".", "/") + "/**/*.ssql");
+				Collections.addAll(userResourceArray, resources);
+			}catch(IOException ioe) {
+				logger.warn("{} 패턴으로부터 쿼리를 추출할 수 없음", patterns[i]);
+			}
 		}
 
 		userResourceArray.sort(new Comparator<Resource>() {
@@ -205,7 +218,7 @@ public class QueryLoader {
 
 	public void load(Resource resource) throws UnsupportedEncodingException, IOException {
 
-		if(logger.isDebugEnabled()) {
+		if (logger.isDebugEnabled()) {
 			logger.debug("load {}", resource.getFilename());
 		}
 
@@ -218,7 +231,8 @@ public class QueryLoader {
 
 		int queryIdLineNo = 0;
 		int lineNo = 0;
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream(), "utf-8"), 1024 * 1024)) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream(), "utf-8"),
+				1024 * 1024)) {
 			while ((line = br.readLine()) != null) {
 				lineNo++;
 				if (blankMatcher.reset(line).matches()) {
@@ -257,10 +271,12 @@ public class QueryLoader {
 
 	}
 
-	private void registerQuery(String resourceURI, int queryIdLineNo, String namespace, String queryId, StringBuilder query, long lastModified) {
+	private void registerQuery(String resourceURI, int queryIdLineNo, String namespace, String queryId,
+			StringBuilder query, long lastModified) {
 		String fullQueryId = (namespace != null ? namespace + "." : "") + queryId;
 		boolean isReloaded = false, isNew = !queryMap.containsKey(fullQueryId);
-		isReloaded = !isNew && StringUtils.compare(queryMap.get(fullQueryId).getChecksum(), Md5Crypt.md5Crypt(query.toString().getBytes())) != 0;
+		isReloaded = !isNew && StringUtils.compare(queryMap.get(fullQueryId).getChecksum(),
+				Md5Crypt.md5Crypt(query.toString().getBytes())) != 0;
 		if (isNew || isReloaded) {
 			queryMap.put(fullQueryId, new Query(resourceURI, queryIdLineNo, fullQueryId, query, lastModified));
 		}
@@ -274,9 +290,9 @@ public class QueryLoader {
 		this.eventPublisher.publishEvent(new QueryReloadEvent(unmodifiableReloadedQueryIds));
 	}
 
-
 	public static void main(String[] args) {
-		System.out.println(QueryLoader.class.getResource("/"));
+//		System.out.println(SSQLQueryLoader.class.getResource("/"));
+			System.out.println("".split(",")[0]);
 	}
 
 }

@@ -1,5 +1,5 @@
 
-package net.asdf.core.query;
+package net.asdf.core.query.parameter;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -46,7 +46,7 @@ public class SqlParameterSourceBuilder {
 
     private Logger logger = LogManager.getLogger();
 
-    @Value("#{query['singlevaluename' ?: 'value']}")
+    @Value("#{tpl['singlevaluename' ?: 'value']}")
     private String singleValueName = "value";
 
     @Autowired(required = false)

@@ -1,5 +1,5 @@
 
-package net.asdf.core.query;
+package net.asdf.core.query.executor;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -15,42 +15,70 @@ import net.asdf.core.exception.FrameworkException;
 import net.asdf.core.model.Model;
 import net.asdf.core.query.template.TemplateResult;
 
-@Component
-public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
+@Component("공통INSERT쿼리실행기")
+public class DefaultInsertQueryExecutor extends AbstractQueryExecutor implements InsertQueryExecutor {
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insert(java.lang.String)
+	 */
+	@Override
 	public int insert(String sql) {
 		TemplateResult tr = createQuery(sql);
-		return defaultNamedParameterJdbcTemplate.update(tr.getSql(), tr.getSqlParameterSource());
+		return 공통명명파라미터JDBC템플릿.update(tr.getSql(), tr.getSqlParameterSource());
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insert(java.lang.String, java.lang.String)
+	 */
+	@Override
 	public int insert(String sql, String value) {
 		TemplateResult tr = createQuery(sql, value);
-		return defaultNamedParameterJdbcTemplate.update(tr.getSql(), tr.getSqlParameterSource());
+		return 공통명명파라미터JDBC템플릿.update(tr.getSql(), tr.getSqlParameterSource());
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insert(java.lang.String, java.lang.Integer)
+	 */
+	@Override
 	public int insert(String sql, Integer value) {
 		TemplateResult tr = createQuery(sql, value);
-		return defaultNamedParameterJdbcTemplate.update(tr.getSql(), tr.getSqlParameterSource());
+		return 공통명명파라미터JDBC템플릿.update(tr.getSql(), tr.getSqlParameterSource());
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insert(java.lang.String, java.lang.Long)
+	 */
+	@Override
 	public int insert(String sql, Long value) {
 		TemplateResult tr = createQuery(sql, value);
-		return defaultNamedParameterJdbcTemplate.update(tr.getSql(), tr.getSqlParameterSource());
+		return 공통명명파라미터JDBC템플릿.update(tr.getSql(), tr.getSqlParameterSource());
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insert(java.lang.String, java.lang.Float)
+	 */
+	@Override
 	public int insert(String sql, Float value) {
 		TemplateResult tr = createQuery(sql, value);
-		return defaultNamedParameterJdbcTemplate.update(tr.getSql(), tr.getSqlParameterSource());
+		return 공통명명파라미터JDBC템플릿.update(tr.getSql(), tr.getSqlParameterSource());
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insert(java.lang.String, java.lang.Double)
+	 */
+	@Override
 	public int insert(String sql, Double value) {
 		TemplateResult tr = createQuery(sql, value);
-		return defaultNamedParameterJdbcTemplate.update(tr.getSql(), tr.getSqlParameterSource());
+		return 공통명명파라미터JDBC템플릿.update(tr.getSql(), tr.getSqlParameterSource());
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insert(java.lang.String, java.math.BigDecimal)
+	 */
+	@Override
 	public int insert(String sql, BigDecimal value) {
 		TemplateResult tr = createQuery(sql, value);
-		return defaultNamedParameterJdbcTemplate.update(tr.getSql(), tr.getSqlParameterSource());
+		return 공통명명파라미터JDBC템플릿.update(tr.getSql(), tr.getSqlParameterSource());
 	}
 
 
@@ -62,7 +90,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 		TemplateResult tr = createQuery(sql, value);
 
 		Map<String, Object> keys = null;
-		keys = this.defaultNamedParameterJdbcTemplate.queryForObject(tr.getSql(), tr.getSqlParameterSource(), getRowMapper());
+		keys = this.공통명명파라미터JDBC템플릿.queryForObject(tr.getSql(), tr.getSqlParameterSource(), getRowMapper());
 
 		if(output != null && keys != null) {
 			output.putAll(keys);
@@ -72,43 +100,79 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, java.lang.String, java.util.Map)
+	 */
+	@Override
 	public int insertAndGet(String sql, String value, Map<String, Object> output) {
 		return insertAndGetInternal(sql, value, output);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, java.lang.Integer, java.util.Map)
+	 */
+	@Override
 	public int insertAndGet(String sql, Integer value, Map<String, Object> output) {
 		return insertAndGetInternal(sql, value, output);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, java.lang.Long, java.util.Map)
+	 */
+	@Override
 	public int insertAndGet(String sql, Long value, Map<String, Object> output) {
 		return insertAndGetInternal(sql, value, output);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, java.lang.Float, java.util.Map)
+	 */
+	@Override
 	public int insertAndGet(String sql, Float value, Map<String, Object> output) {
 		return insertAndGetInternal(sql, value, output);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, java.lang.Double, java.util.Map)
+	 */
+	@Override
 	public int insertAndGet(String sql, Double value, Map<String, Object> output) {
 		return insertAndGetInternal(sql, value, output);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, java.math.BigDecimal, java.util.Map)
+	 */
+	@Override
 	public int insertAndGet(String sql, BigDecimal value, Map<String, Object> output) {
 		return insertAndGetInternal(sql, value, output);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insert(java.lang.String, T)
+	 */
+	@Override
 	public <T extends Model> int insert(String sql, T param) {
 		TemplateResult tr = createQuery(sql, param);
-		return defaultNamedParameterJdbcTemplate.update(tr.getSql(), tr.getSqlParameterSource());
+		return 공통명명파라미터JDBC템플릿.update(tr.getSql(), tr.getSqlParameterSource());
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insert(java.lang.String, java.util.Map)
+	 */
+	@Override
 	public int insert(String sql, Map<String, Object> param) {
 		TemplateResult tr = createQuery(sql, param);
-		return defaultNamedParameterJdbcTemplate.update(tr.getSql(), tr.getSqlParameterSource());
+		return 공통명명파라미터JDBC템플릿.update(tr.getSql(), tr.getSqlParameterSource());
 	}
 
 
 
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, T)
+	 */
+	@Override
 	public <T extends Model> int insertAndGet(String sql, T param) {
 		TemplateResult result = createQuery(sql, param, true);
 
@@ -125,7 +189,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			case "oracle":
 				if(result.hasGenKey()) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					insertedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(result.getGeneratedKeyPropertyName(key), returnMap.remove(key));
@@ -138,7 +202,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			case "mariadb":
 				if(result.hasGenKey() && result.getGeneratedKeyColumns().length == 1) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					insertedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(result.getGeneratedKeyPropertyName(result.getGeneratedKeyColumns()[0]), returnMap.remove(key));
@@ -154,7 +218,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			break;
 
 			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+				returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 			break;
 
 			default:
@@ -168,6 +232,10 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 		return insertedRowCount;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, T, java.util.Map)
+	 */
+	@Override
 	public <T extends Model> int insertAndGet(String sql, T param, Map<String, Object> output) {
 		TemplateResult result = createQuery(sql, param, true);
 
@@ -184,7 +252,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			case "oracle":
 				if(result.hasGenKey()) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					insertedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(result.getGeneratedKeyPropertyName(key), returnMap.remove(key));
@@ -198,7 +266,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			case "mariadb":
 				if(result.hasGenKey() && result.getGeneratedKeyColumns().length == 1) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
+					insertedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, result.getGeneratedKeyColumns());
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(result.getGeneratedKeyPropertyName(result.getGeneratedKeyColumns()[0]), returnMap.remove(key));
@@ -214,7 +282,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			break;
 
 			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+				returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 			break;
 
 			default:
@@ -228,6 +296,10 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 		return insertedRowCount;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, T, java.lang.String[], java.util.Map)
+	 */
+	@Override
 	public <T extends Model> int insertAndGet(String sql, T param, String[] outColumns, Map<String, Object> output) {
 		TemplateResult result = createQuery(sql, param);
 
@@ -244,7 +316,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			case "oracle":
 				if(outColumns != null && outColumns.length > 0) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					insertedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -258,7 +330,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			case "mariadb":
 				if(outColumns != null && outColumns.length == 1) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					insertedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -274,7 +346,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			break;
 
 			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+				returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 			break;
 
 			default:
@@ -288,6 +360,10 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 		return insertedRowCount;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, java.util.Map, java.lang.String[])
+	 */
+	@Override
 	public int insertAndGet(String sql, Map<String, Object> param, String[] outColumns) {
 		TemplateResult result = createQuery(sql, param);
 
@@ -304,7 +380,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			case "oracle":
 				if(outColumns != null && outColumns.length > 0) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					insertedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -318,7 +394,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			case "mariadb":
 				if(outColumns != null && outColumns.length == 1) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					insertedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -334,7 +410,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			break;
 
 			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+				returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 				break;
 
 			default:
@@ -346,6 +422,10 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 		return insertedRowCount;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, java.util.Map, java.lang.String[], java.util.Map)
+	 */
+	@Override
 	public int insertAndGet(String sql, Map<String, Object> param, String[] outColumns, Map<String,Object> output) {
 		TemplateResult result = createQuery(sql, param);
 
@@ -362,7 +442,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			case "oracle":
 				if(outColumns != null && outColumns.length > 0) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					insertedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -376,7 +456,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			case "mariadb":
 				if(outColumns != null && outColumns.length == 1) {
 					KeyHolder keyHolder = new GeneratedKeyHolder();
-					insertedRowCount = this.defaultNamedParameterJdbcTemplate.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
+					insertedRowCount = this.공통명명파라미터JDBC템플릿.update(result.getSql(), result.getSqlParameterSource(), keyHolder, outColumns);
 					returnMap = keyHolder.getKeys();
 					for(String key : returnMap.keySet()) {
 						returnMap.put(key, returnMap.remove(key));
@@ -392,7 +472,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			break;
 
 			case "sqlserver":
-				returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+				returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 			break;
 
 			default:
@@ -406,6 +486,10 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 		return insertedRowCount;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.asdf.core.query.InsertQueryExecutor#insertAndGet(java.lang.String, java.util.Map)
+	 */
+	@Override
 	public int insertAndGet(String sql, Map<String, Object> param) {
 		TemplateResult result = createQuery(sql, param);
 
@@ -423,7 +507,7 @@ public class DefaultInsertQueryExecutor extends AbstractQueryExecutor {
 			throw new FrameworkException("키를 지정하지 않은 입력쿼리의 결과값 반환은 SQL Server에서만 지원합니다.");
 		}
 
-		returnMap = this.defaultNamedParameterJdbcTemplate.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
+		returnMap = this.공통명명파라미터JDBC템플릿.queryForObject(result.getSql(), result.getSqlParameterSource(), getRowMapper());
 
 		if(param != null) {
 			param.putAll(returnMap);

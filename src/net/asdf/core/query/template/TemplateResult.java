@@ -9,11 +9,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 public class TemplateResult {
+
 	private SqlParameterSource sqlParameterSource;
 
 	private String sql;
 
 	private String[] generatedKeyColumns = ArrayUtils.EMPTY_STRING_ARRAY;
+
 	private Map<String, String> generatedKeyColumnMap = Collections.emptyMap();
 
 	public boolean hasGenKey() {
@@ -28,7 +30,6 @@ public class TemplateResult {
 	public void setSqlParameterSource(SqlParameterSource sqlParameterSource) {
 		this.sqlParameterSource = sqlParameterSource;
 	}
-
 
 	public String getSql() {
 		return sql;

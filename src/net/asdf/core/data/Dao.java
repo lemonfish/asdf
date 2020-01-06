@@ -1,11 +1,11 @@
 
 package net.asdf.core.data;
 
-import net.asdf.core.query.CommonQueryExecutor;
+import net.asdf.core.query.executor.CommonQueryExecutor;
 
 public interface Dao {
 
-	void setQueryExecutor(CommonQueryExecutor queryExecutor);
+	void setQueryExecutor(CommonQueryExecutor 쿼리실행기);
 
 	static String PARAM_NO_PAGING = "nopaging";
 

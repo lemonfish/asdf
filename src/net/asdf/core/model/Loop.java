@@ -76,23 +76,4 @@ public class Loop {
         list.stream().filter(p -> status.equals(p.get(StatefullModel.ROW_STATUS_FIELD))).forEachOrdered(consumer);
     }
 
-    public static void main1(String[] args) {
-        List<SampleModel> list = new ArrayList<>();
-
-        list.add(new SampleModel("hello", StatefullModel.STATUS_DELETE));
-        list.add(new SampleModel("world", StatefullModel.STATUS_UPDATE));
-        list.add(new SampleModel("good", StatefullModel.STATUS_NORMAL));
-        list.add(new SampleModel("bye", StatefullModel.STATUS_DELETE));
-        list.add(new SampleModel("exit", StatefullModel.STATUS_INSERT));
-        list.add(new SampleModel("null", null));
-
-        Loop.loop(list, StatefullModel.STATUS_DELETE,
-                model -> System.out.println("delete: " + model.getName() + "[" + model.getRowStatus() + "]"));
-        Loop.update(list, model -> System.out.println("update: " + model.getName() + "[" + model.getRowStatus() + "]"));
-
-        Loop.undefined(list,
-                model -> System.out.println("undefined: " + model.getName() + "[" + model.getRowStatus() + "]"));
-        Loop.other(list,
-                model -> System.out.println("other: " + model.getName() + "[" + model.getRowStatus() + "]"));
-    }
 }

@@ -29,7 +29,7 @@ public class CommonCont {
 	}
 
 	@Resource
-	protected CommonService commonService;
+	protected CommonService 공통서비스;
 
 	protected Map<String, Object> ok(Object 응답데이터){
 		return ResponseUtil.ok(응답데이터);

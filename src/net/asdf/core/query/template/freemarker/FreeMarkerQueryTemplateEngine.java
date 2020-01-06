@@ -40,9 +40,9 @@ import net.asdf.core.event.ReloadEvent;
 import net.asdf.core.exception.SysException;
 import net.asdf.core.model.Model;
 import net.asdf.core.model.annotation.GenKey;
-import net.asdf.core.query.CombinedSqlParameterSource;
 import net.asdf.core.query.Query;
-import net.asdf.core.query.SqlParameterSourceBuilder;
+import net.asdf.core.query.parameter.CombinedSqlParameterSource;
+import net.asdf.core.query.parameter.SqlParameterSourceBuilder;
 import net.asdf.core.query.template.QueryTemplateEngine;
 import net.asdf.core.query.template.TemplateResult;
 import net.asdf.core.util.Mapz;
@@ -60,10 +60,10 @@ public class FreeMarkerQueryTemplateEngine implements QueryTemplateEngine{
 	@Value("#{asdf['query.sessionprefix' ?: 'S']}")
 	private String sessionPrefix;
 
-	@Value("#{adsf['query.encoding.input' ?: 'UTF-8']}")
+	@Value("#{asdf['query.encoding.input' ?: 'UTF-8']}")
 	private String inputEncoding;
 
-	@Value("#{asdf['query.encoding.output' ?: 'UTF-8']}")
+	@Value("#{adsf['query.encoding.output' ?: 'UTF-8']}")
 	private String outputEncoding;
 
 	@Resource

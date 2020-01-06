@@ -8,7 +8,7 @@ import org.springframework.core.convert.converter.ConditionalGenericConverter;
 
 public class PrivateInfoConverter implements ConditionalGenericConverter {
 
-	@Autowired
+	@Autowired(required = false)
 	private CipherService cipherService;
 
 	@Override
@@ -23,7 +23,7 @@ public class PrivateInfoConverter implements ConditionalGenericConverter {
 
 	@Override
 	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
-		return cipherService.decipher((String) source);
+		return cipherService != null ? cipherService.decipher((String) source) : source;
 	}
 
 }

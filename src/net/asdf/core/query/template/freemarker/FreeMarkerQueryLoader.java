@@ -13,14 +13,14 @@ import org.springframework.stereotype.Component;
 
 import freemarker.cache.TemplateLoader;
 import net.asdf.core.query.Query;
-import net.asdf.core.query.QueryLoader;
+import net.asdf.core.query.loader.QueryLoader;
 
 @Component
 public class FreeMarkerQueryLoader implements TemplateLoader {
 
 	protected Logger logger = LogManager.getLogger(this);
 
-	@Resource
+	@Resource(name="SSQL쿼리로더")
 	private QueryLoader queryLoader;
 
 	@Override

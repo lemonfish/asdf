@@ -149,7 +149,7 @@ public class AuthNZInterceptor extends HandlerInterceptorAdapter {
 				response.setHeader("X-Error-Message", "로그인이 필요합니다.");
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				return false;
-			}else if(nativeSession.getAttribute("사용자아이디") == null){
+			}else if(nativeSession.getAttribute(SessionVariables.SESSION_KEY) == null){
 				// 인증 정보가 없습니다. 401
 				// 세션이 만료됨
 				response.setHeader("X-Error-Code", "E00002");

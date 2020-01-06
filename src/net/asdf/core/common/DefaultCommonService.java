@@ -6,35 +6,52 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import net.asdf.core.data.CommonDao;
 import net.asdf.core.jdbc.transaction.NeedTx;
 import net.asdf.core.jdbc.transaction.NoTx;
 import net.asdf.core.model.Model;
 import net.asdf.core.model.StatefullModel;
+import net.asdf.core.query.QueryIdGenerator;
 
-@Service
+@Service("공통서비스")
 public class DefaultCommonService implements CommonService {
+
+	private Logger logger = LogManager.getLogger(this);
+
+	@Resource
+	private CommonDao 공통데이터접근기;
+
+	private boolean 데이터접근기직접설정;
+
+	@Resource
+	private QueryIdGenerator 쿼리아이디생성기;
+
+	private boolean 쿼리아이디생성기직접설정;
 
 	/**
 	 * 생성 서비스
 	 */
-	@Resource
-	private DefaultInsertService defaultInsertService;
+	@Resource(name="공통INSERT서비스")
+	private InsertService insert;
 
 	/**
 	 * 수정, 삭제 서비스
 	 */
-	@Resource
-	private DefaultUpdateService defaultUpdateService;
+	@Resource(name="공통UPDATE서비스")
+	private UpdateService update;
 
 	/**
 	 * 조회 서비스
 	 */
-	@Resource
-	private DefaultSelectService defaultSelectService;
+	@Resource(name="공통SELECT서비스")
+	private SelectService select;
 
 	/**
 	 * @return 입력된 행 수
@@ -43,7 +60,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insertSimple() {
-		return defaultInsertService.insertSimple();
+		return insert.insertSimple();
 	}
 
 	/**
@@ -54,7 +71,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insertSimple(Map<String, Object> param) {
-		return defaultInsertService.insertSimple(param);
+		return insert.insertSimple(param);
 	}
 
 	/**
@@ -65,7 +82,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public <T extends Model> int insertSimple(T param) {
-		return defaultInsertService.insertSimple(param);
+		return insert.insertSimple(param);
 	}
 
 	/**
@@ -76,7 +93,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insertSimple(String value) {
-		return defaultInsertService.insertSimple(value);
+		return insert.insertSimple(value);
 	}
 
 	/**
@@ -87,7 +104,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insertSimple(Integer value) {
-		return defaultInsertService.insertSimple(value);
+		return insert.insertSimple(value);
 	}
 
 	/**
@@ -98,7 +115,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insertSimple(Long value) {
-		return defaultInsertService.insertSimple(value);
+		return insert.insertSimple(value);
 	}
 
 	/**
@@ -109,7 +126,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insertSimple(Float value) {
-		return defaultInsertService.insertSimple(value);
+		return insert.insertSimple(value);
 	}
 
 	/**
@@ -120,7 +137,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insertSimple(Double value) {
-		return defaultInsertService.insertSimple(value);
+		return insert.insertSimple(value);
 	}
 
 	/**
@@ -131,7 +148,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insertSimple(BigDecimal value) {
-		return defaultInsertService.insertSimple(value);
+		return insert.insertSimple(value);
 	}
 
 	/**
@@ -142,7 +159,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public <T extends Model> int insertAndGetSimple(T param) {
-		return defaultInsertService.insertAndGetSimple(param);
+		return insert.insertAndGetSimple(param);
 	}
 
 	/**
@@ -154,7 +171,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insertAndGetSimple(Map<String, Object> param, String[] columns) {
-		return defaultInsertService.insertAndGetSimple(param, columns);
+		return insert.insertAndGetSimple(param, columns);
 	}
 
 	/**
@@ -165,7 +182,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insert(String sql) {
-		return defaultInsertService.insert(sql);
+		return insert.insert(sql);
 	}
 
 	/**
@@ -177,7 +194,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insert(String sql, String value) {
-		return defaultInsertService.insert(sql, value);
+		return insert.insert(sql, value);
 	}
 
 	/**
@@ -189,7 +206,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insert(String sql, Integer value) {
-		return defaultInsertService.insert(sql, value);
+		return insert.insert(sql, value);
 	}
 
 	/**
@@ -201,7 +218,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insert(String sql, Long value) {
-		return defaultInsertService.insert(sql, value);
+		return insert.insert(sql, value);
 	}
 
 	/**
@@ -213,7 +230,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insert(String sql, Float value) {
-		return defaultInsertService.insert(sql, value);
+		return insert.insert(sql, value);
 	}
 
 	/**
@@ -225,7 +242,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insert(String sql, Double value) {
-		return defaultInsertService.insert(sql, value);
+		return insert.insert(sql, value);
 	}
 
 	/**
@@ -237,7 +254,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insert(String sql, BigDecimal value) {
-		return defaultInsertService.insert(sql, value);
+		return insert.insert(sql, value);
 	}
 
 	/**
@@ -249,7 +266,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public <T extends Model> int insert(String sql, T param) {
-		return defaultInsertService.insert(sql, param);
+		return insert.insert(sql, param);
 	}
 
 	/**
@@ -261,7 +278,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public <T extends Model> int insertAndGet(String sql, T param) {
-		return defaultInsertService.insertAndGet(sql, param);
+		return insert.insertAndGet(sql, param);
 	}
 
 	/**
@@ -273,7 +290,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insert(String sql, Map<String, Object> param) {
-		return defaultInsertService.insert(sql, param);
+		return insert.insert(sql, param);
 	}
 
 	/**
@@ -286,7 +303,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int insert(String sql, Map<String, Object> param, String[] columns) {
-		return defaultInsertService.insert(sql, param, columns);
+		return insert.insert(sql, param, columns);
 	}
 
 	/**
@@ -296,7 +313,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int updateSimple() {
-		return defaultUpdateService.updateSimple();
+		return update.updateSimple();
 	}
 
 	/**
@@ -307,19 +324,19 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int updateSimple(String value) {
-		return defaultUpdateService.updateSimple(value);
+		return update.updateSimple(value);
 	}
 
 	@Override
 	@NeedTx
 	public int updateSimple(Map<String, Object> param) {
-		return defaultUpdateService.updateSimple(param);
+		return update.updateSimple(param);
 	}
 
 	@Override
 	@NeedTx
 	public <T extends Model> int updateSimple(T param) {
-		return defaultUpdateService.updateSimple(param);
+		return update.updateSimple(param);
 	}
 
 	/**
@@ -330,7 +347,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int update(String sql) {
-		return defaultUpdateService.update(sql);
+		return update.update(sql);
 	}
 
 	/**
@@ -342,7 +359,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int update(String sql, String value) {
-		return defaultUpdateService.update(sql, value);
+		return update.update(sql, value);
 	}
 
 	/**
@@ -354,7 +371,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int update(String sql, Integer value) {
-		return defaultUpdateService.update(sql, value);
+		return update.update(sql, value);
 	}
 
 	/**
@@ -366,7 +383,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int update(String sql, Long value) {
-		return defaultUpdateService.update(sql, value);
+		return update.update(sql, value);
 	}
 
 	/**
@@ -378,7 +395,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public int update(String sql, BigDecimal value) {
-		return defaultUpdateService.update(sql, value);
+		return update.update(sql, value);
 	}
 
 	/**
@@ -390,13 +407,13 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NeedTx
 	public <T extends Model> int update(String sql, T param) {
-		return defaultUpdateService.update(sql, param);
+		return update.update(sql, param);
 	}
 
 	@Override
 	@NeedTx
 	public int update(String sql, Map<String, Object> param) {
-		return defaultUpdateService.update(sql, param);
+		return update.update(sql, param);
 	}
 
 	/**
@@ -409,36 +426,36 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model, S extends Model> S get(String sql, T param, Class<S> clazz) {
-		return defaultSelectService.get(sql, param, clazz);
+		return select.get(sql, param, clazz);
 	}
 
 	@NoTx
 	public <T extends Model> Map<String, Object> get(String sql, T param) {
-		return defaultSelectService.get(sql, param);
+		return select.get(sql, param);
 	}
 
 	@Override
 	@NoTx
 	public Map<String, Object> get(String sql, Map<String, Object> param) {
-		return defaultSelectService.get(sql, param);
+		return select.get(sql, param);
 	}
 
 	@Override
 	@NoTx
 	public Map<String, Object> get(String sql, String value) {
-		return defaultSelectService.get(sql, value);
+		return select.get(sql, value);
 	}
 
 	@Override
 	@NoTx
 	public Map<String, Object> get(String sql, Integer value) {
-		return defaultSelectService.get(sql, value);
+		return select.get(sql, value);
 	}
 
 	@Override
 	@NoTx
 	public Map<String, Object> get(String sql) {
-		return defaultSelectService.get(sql);
+		return select.get(sql);
 	}
 
 	/**
@@ -448,7 +465,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> getSimple() {
-		return defaultSelectService.getSimple();
+		return select.getSimple();
 	}
 
 	/**
@@ -459,7 +476,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> getSimple(Map<String, Object> param) {
-		return defaultSelectService.getSimple(param);
+		return select.getSimple(param);
 	}
 
 	/**
@@ -470,7 +487,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> Map<String, Object> getSimple(T param) {
-		return defaultSelectService.getSimple(param);
+		return select.getSimple(param);
 	}
 
 	/**
@@ -482,19 +499,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> T getSimple(Map<String, Object> param, Class<T> clazz) {
-		return defaultSelectService.getSimple(param, clazz);
-	}
-
-	/**
-	 * @param param
-	 * @param clazz
-	 * @return
-	 * @see net.asdf.core.common.DefaultSelectService#getSimple(net.asdf.core.model.Model, java.lang.Class)
-	 */
-	@Override
-	@NoTx
-	public <T extends Model> T getSimple(Model param, Class<T> clazz) {
-		return defaultSelectService.getSimple(param, clazz);
+		return select.getSimple(param, clazz);
 	}
 
 	/**
@@ -506,7 +511,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> List<T> list(String sql, Class<T> clazz) {
-		return defaultSelectService.list(sql, clazz);
+		return select.list(sql, clazz);
 	}
 
 	/**
@@ -517,7 +522,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> one(String sql) {
-		return defaultSelectService.one(sql);
+		return select.one(sql);
 	}
 
 	/**
@@ -529,7 +534,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> T one(String sql, Class<T> clazz) {
-		return defaultSelectService.one(sql, clazz);
+		return select.one(sql, clazz);
 	}
 
 	/**
@@ -541,7 +546,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> one(String sql, Map<String, Object> param) {
-		return defaultSelectService.one(sql, param);
+		return select.one(sql, param);
 	}
 
 	/**
@@ -553,7 +558,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> Map<String, Object> one(String sql, T param) {
-		return defaultSelectService.one(sql, param);
+		return select.one(sql, param);
 	}
 
 	/**
@@ -566,7 +571,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> T one(String sql, Map<String, Object> param, Class<T> clazz) {
-		return defaultSelectService.one(sql, param, clazz);
+		return select.one(sql, param, clazz);
 	}
 
 	/**
@@ -578,13 +583,13 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> T oneSimple(Map<String, Object> param, Class<T> clazz) {
-		return defaultSelectService.oneSimple(param, clazz);
+		return select.oneSimple(param, clazz);
 	}
 
 	@Override
 	@NoTx
 	public <T extends Model> T oneSimple(Model param, Class<T> clazz) {
-		return defaultSelectService.oneSimple(param, clazz);
+		return select.oneSimple(param, clazz);
 	}
 
 	/**
@@ -595,7 +600,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> T oneSimple(Class<T> clazz) {
-		return defaultSelectService.oneSimple(clazz);
+		return select.oneSimple(clazz);
 	}
 
 	/**
@@ -605,7 +610,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> oneSimple() {
-		return defaultSelectService.oneSimple();
+		return select.oneSimple();
 	}
 
 	/**
@@ -616,7 +621,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> Map<String, Object> oneSimple(T param) {
-		return defaultSelectService.oneSimple(param);
+		return select.oneSimple(param);
 	}
 
 	/**
@@ -627,7 +632,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> oneSimple(Map<String, Object> param) {
-		return defaultSelectService.oneSimple(param);
+		return select.oneSimple(param);
 	}
 
 	/**
@@ -637,7 +642,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public List<Map<String, Object>> listSimple() {
-		return defaultSelectService.listSimple();
+		return select.listSimple();
 	}
 
 	/**
@@ -648,7 +653,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> List<T> listSimple(Class<T> clazz) {
-		return defaultSelectService.listSimple(clazz);
+		return select.listSimple(clazz);
 	}
 
 	/**
@@ -659,7 +664,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public List<Map<String, Object>> listSimple(Map<String, Object> param) {
-		return defaultSelectService.listSimple(param);
+		return select.listSimple(param);
 	}
 
 	/**
@@ -670,7 +675,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> List<Map<String, Object>> listSimple(T param) {
-		return defaultSelectService.listSimple(param);
+		return select.listSimple(param);
 	}
 
 	/**
@@ -682,7 +687,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> List<T> listSimple(Map<String, Object> param, Class<T> clazz) {
-		return defaultSelectService.listSimple(param, clazz);
+		return select.listSimple(param, clazz);
 	}
 
 	/**
@@ -694,7 +699,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model, S extends Model> List<S> listSimple(T param, Class<S> clazz) {
-		return defaultSelectService.listSimple(param, clazz);
+		return select.listSimple(param, clazz);
 	}
 
 	/**
@@ -705,7 +710,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public List<Map<String, Object>> list(String sql) {
-		return defaultSelectService.list(sql);
+		return select.list(sql);
 	}
 
 	/**
@@ -717,7 +722,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> List<Map<String, Object>> list(String sql, T param) {
-		return defaultSelectService.list(sql, param);
+		return select.list(sql, param);
 	}
 
 	/**
@@ -729,7 +734,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public List<Map<String, Object>> list(String sql, Map<String, Object> param) {
-		return defaultSelectService.list(sql, param);
+		return select.list(sql, param);
 	}
 
 	/**
@@ -742,20 +747,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> List<T> list(String sql, Map<String, Object> param, Class<T> clazz) {
-		return defaultSelectService.list(sql, param, clazz);
-	}
-
-	/**
-	 * @param sql
-	 * @param param
-	 * @param clazz
-	 * @return
-	 * @see net.asdf.core.common.DefaultSelectService#list(java.lang.String, net.asdf.core.model.Model, java.lang.Class)
-	 */
-	@Override
-	@NoTx
-	public <T extends Model> List<T> list(String sql, Model param, Class<T> clazz) {
-		return defaultSelectService.list(sql, param, clazz);
+		return select.list(sql, param, clazz);
 	}
 
 	/**
@@ -766,7 +758,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> oneSimple(String value) {
-		return defaultSelectService.oneSimple(value);
+		return select.oneSimple(value);
 	}
 
 	/**
@@ -777,7 +769,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> oneSimple(Integer value) {
-		return defaultSelectService.oneSimple(value);
+		return select.oneSimple(value);
 	}
 
 	/**
@@ -788,7 +780,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> oneSimple(Float value) {
-		return defaultSelectService.oneSimple(value);
+		return select.oneSimple(value);
 	}
 
 	/**
@@ -799,7 +791,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> oneSimple(Double value) {
-		return defaultSelectService.oneSimple(value);
+		return select.oneSimple(value);
 	}
 
 	/**
@@ -810,7 +802,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> oneSimple(BigDecimal value) {
-		return defaultSelectService.oneSimple(value);
+		return select.oneSimple(value);
 	}
 
 	/**
@@ -822,7 +814,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> one(String sql, String value) {
-		return defaultSelectService.one(sql, value);
+		return select.one(sql, value);
 	}
 
 	/**
@@ -834,7 +826,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> one(String sql, Integer value) {
-		return defaultSelectService.one(sql, value);
+		return select.one(sql, value);
 	}
 
 	/**
@@ -846,7 +838,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> one(String sql, Float value) {
-		return defaultSelectService.one(sql, value);
+		return select.one(sql, value);
 	}
 
 	/**
@@ -858,7 +850,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> one(String sql, Double value) {
-		return defaultSelectService.one(sql, value);
+		return select.one(sql, value);
 	}
 
 	/**
@@ -870,7 +862,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public Map<String, Object> one(String sql, BigDecimal value) {
-		return defaultSelectService.one(sql, value);
+		return select.one(sql, value);
 	}
 
 	/**
@@ -883,7 +875,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> T one(String sql, String value, Class<T> clazz) {
-		return defaultSelectService.one(sql, value, clazz);
+		return select.one(sql, value, clazz);
 	}
 
 	/**
@@ -896,7 +888,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> T one(String sql, Integer value, Class<T> clazz) {
-		return defaultSelectService.one(sql, value, clazz);
+		return select.one(sql, value, clazz);
 	}
 
 
@@ -911,7 +903,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> T one(String sql, Float value, Class<T> clazz) {
-		return defaultSelectService.one(sql, value, clazz);
+		return select.one(sql, value, clazz);
 	}
 
 	/**
@@ -924,7 +916,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> T one(String sql, Double value, Class<T> clazz) {
-		return defaultSelectService.one(sql, value, clazz);
+		return select.one(sql, value, clazz);
 	}
 
 	/**
@@ -937,7 +929,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> T one(String sql, BigDecimal value, Class<T> clazz) {
-		return defaultSelectService.one(sql, value, clazz);
+		return select.one(sql, value, clazz);
 	}
 
 	/**
@@ -948,7 +940,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public List<Map<String, Object>> listSimple(String value) {
-		return defaultSelectService.listSimple(value);
+		return select.listSimple(value);
 	}
 
 	/**
@@ -959,7 +951,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public List<Map<String, Object>> listSimple(Integer value) {
-		return defaultSelectService.listSimple(value);
+		return select.listSimple(value);
 	}
 
 	/**
@@ -970,7 +962,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public List<Map<String, Object>> listSimple(Float value) {
-		return defaultSelectService.listSimple(value);
+		return select.listSimple(value);
 	}
 
 	/**
@@ -981,7 +973,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public List<Map<String, Object>> listSimple(Double value) {
-		return defaultSelectService.listSimple(value);
+		return select.listSimple(value);
 	}
 
 	/**
@@ -992,7 +984,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public List<Map<String, Object>> listSimple(BigDecimal value) {
-		return defaultSelectService.listSimple(value);
+		return select.listSimple(value);
 	}
 
 	/**
@@ -1004,7 +996,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> List<T> listSimple(String value, Class<T> clazz) {
-		return defaultSelectService.listSimple(value, clazz);
+		return select.listSimple(value, clazz);
 	}
 
 	/**
@@ -1016,7 +1008,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> List<T> listSimple(Integer value, Class<T> clazz) {
-		return defaultSelectService.listSimple(value, clazz);
+		return select.listSimple(value, clazz);
 	}
 
 	/**
@@ -1028,7 +1020,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> List<T> listSimple(Float value, Class<T> clazz) {
-		return defaultSelectService.listSimple(value, clazz);
+		return select.listSimple(value, clazz);
 	}
 
 	/**
@@ -1040,7 +1032,7 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> List<T> listSimple(Double value, Class<T> clazz) {
-		return defaultSelectService.listSimple(value, clazz);
+		return select.listSimple(value, clazz);
 	}
 
 	/**
@@ -1052,13 +1044,13 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public <T extends Model> List<T> listSimple(BigDecimal value, Class<T> clazz) {
-		return defaultSelectService.listSimple(value, clazz);
+		return select.listSimple(value, clazz);
 	}
 
 	@Override
 	@NoTx
 	public <T extends Model, S extends Model> S one(String sql, T param, Class<S> clazz) {
-		return defaultSelectService.one(sql, param, clazz);
+		return select.one(sql, param, clazz);
 	}
 
 	/**
@@ -1071,25 +1063,25 @@ public class DefaultCommonService implements CommonService {
 	@Override
 	@NoTx
 	public int insertAndGet(String sql, Map<String, Object> param, String[] columns) {
-		return defaultInsertService.insertAndGet(sql, param, columns);
+		return insert.insertAndGet(sql, param, columns);
 	}
 
 	@Override
 	@NoTx
 	public int updateAndGet(String sql, Map<String, Object> param, String[] columns) {
-		return defaultUpdateService.updateAndGet(sql, param, columns);
+		return update.updateAndGet(sql, param, columns);
 	}
 
 	@Override
 	@NoTx
 	public <T extends Model> int updateAndGet(String sql, T model) {
-		return defaultUpdateService.updateAndGet(sql, model);
+		return update.updateAndGet(sql, model);
 	}
 
 	@Override
 	@NoTx
 	public <T extends Model> List<T> list(String sql, Integer value, Class<T> clazz) {
-		return defaultSelectService.list(sql, value, clazz);
+		return select.list(sql, value, clazz);
 	}
 
 	@Override
@@ -1104,15 +1096,15 @@ public class DefaultCommonService implements CommonService {
 			switch((String)저장할데이터.get(StatefullModel.ROW_STATUS_FIELD)) {
 			case StatefullModel.STATUS_INSERT:
 
-				defaultInsertService.insert(sqlPrefix + ".신규", 저장할데이터);
+				insert.insert(sqlPrefix + ".신규", 저장할데이터);
 				결과건수[0]++;
 				break;
 			case StatefullModel.STATUS_UPDATE:
-				defaultUpdateService.update(sqlPrefix + ".수정", 저장할데이터);
+				update.update(sqlPrefix + ".수정", 저장할데이터);
 				결과건수[1]++;
 				break;
 			case StatefullModel.STATUS_DELETE:
-				defaultUpdateService.update(sqlPrefix + ".삭제", 저장할데이터);
+				update.update(sqlPrefix + ".삭제", 저장할데이터);
 				결과건수[2]++;
 				break;
 			default:
@@ -1136,22 +1128,22 @@ public class DefaultCommonService implements CommonService {
 			switch(저장할데이터.getRowStatus()) {
 			case StatefullModel.STATUS_INSERT:
 				if(useAndGet) {
-					defaultInsertService.insertAndGet(sqlPrefix + ".신규", 저장할데이터);
+					insert.insertAndGet(sqlPrefix + ".신규", 저장할데이터);
 				}else {
-					defaultInsertService.insert(sqlPrefix + ".신규", 저장할데이터);
+					insert.insert(sqlPrefix + ".신규", 저장할데이터);
 				}
 				결과건수[0]++;
 				break;
 			case StatefullModel.STATUS_UPDATE:
 				if(useAndGet) {
-					defaultUpdateService.updateAndGet(sqlPrefix + ".수정", 저장할데이터);
+					update.updateAndGet(sqlPrefix + ".수정", 저장할데이터);
 				}else {
-					defaultUpdateService.update(sqlPrefix + ".수정", 저장할데이터);
+					update.update(sqlPrefix + ".수정", 저장할데이터);
 				}
 				결과건수[1]++;
 				break;
 			case StatefullModel.STATUS_DELETE:
-				defaultUpdateService.update(sqlPrefix + ".삭제", 저장할데이터);
+				update.update(sqlPrefix + ".삭제", 저장할데이터);
 				결과건수[2]++;
 				break;
 			default:
@@ -1178,13 +1170,13 @@ public class DefaultCommonService implements CommonService {
 			if(dataStatus.equals(저장할데이터.get(StatefullModel.ROW_STATUS_FIELD))) {
 				switch(sqlStatus) {
 				case StatefullModel.STATUS_INSERT:
-					결과건수[i] = defaultInsertService.insert(sql, 저장할데이터);
+					결과건수[i] = insert.insert(sql, 저장할데이터);
 					break;
 				case StatefullModel.STATUS_UPDATE:
-					결과건수[i] = defaultUpdateService.update(sql, 저장할데이터);
+					결과건수[i] = update.update(sql, 저장할데이터);
 					break;
 				case StatefullModel.STATUS_DELETE:
-					결과건수[i] = defaultUpdateService.update(sql, 저장할데이터);
+					결과건수[i] = update.update(sql, 저장할데이터);
 					break;
 				default:
 					결과건수[i]++;
@@ -1210,20 +1202,20 @@ public class DefaultCommonService implements CommonService {
 				switch(sqlStatus) {
 					case StatefullModel.STATUS_INSERT:
 						if(useAndGet) {
-							결과건수[i] = defaultInsertService.insertAndGet(sql, 저장할데이터);
+							결과건수[i] = insert.insertAndGet(sql, 저장할데이터);
 						}else {
-							결과건수[i] = defaultInsertService.insert(sql, 저장할데이터);
+							결과건수[i] = insert.insert(sql, 저장할데이터);
 						}
 						break;
 					case StatefullModel.STATUS_UPDATE:
 						if(useAndGet) {
-							결과건수[i] = defaultUpdateService.updateAndGet(sql, 저장할데이터);
+							결과건수[i] = update.updateAndGet(sql, 저장할데이터);
 						}else {
-							결과건수[i] = defaultUpdateService.update(sql, 저장할데이터);
+							결과건수[i] = update.update(sql, 저장할데이터);
 						}
 						break;
 					case StatefullModel.STATUS_DELETE:
-						결과건수[i] = defaultUpdateService.update(sql, 저장할데이터);
+						결과건수[i] = update.update(sql, 저장할데이터);
 						break;
 					default:
 						결과건수[i]++;
@@ -1232,6 +1224,64 @@ public class DefaultCommonService implements CommonService {
 		}
 
 		return 결과건수;
+	}
+
+	public void setInsert(InsertService insert) {
+		this.insert = insert;
+	}
+
+	public void setUpdate(UpdateService update) {
+		this.update = update;
+	}
+
+	public void setSelect(SelectService select) {
+		this.select = select;
+	}
+
+	@Override
+	public void setCommonDao(CommonDao commonDao) {
+		if(!데이터접근기직접설정) {
+			this.공통데이터접근기 = commonDao;
+			데이터접근기직접설정 = true;
+		}else {
+			logger.warn("직접설정된 데이터접근기는 변경할 수 없습니다.");
+		}
+	}
+
+	@Override
+	public void setQueryIdGenerator(QueryIdGenerator queryIdGenerator) {
+		if(!쿼리아이디생성기직접설정) {
+			this.쿼리아이디생성기 = queryIdGenerator;
+			쿼리아이디생성기직접설정 = true;
+		}else {
+			logger.warn("직접설정된 쿼리아이디생성기는 변경할 수 없습니다.");
+		}
+	}
+
+	@Override
+	public <T extends Model, S extends Model> S getSimple(T param, Class<S> clazz) {
+		return select.getSimple(param, clazz);
+	}
+
+	@Override
+	public <T extends Model, S extends Model> List<S> list(String sql, T param, Class<S> clazz) {
+		return select.list(sql, param, clazz);
+	}
+
+	@PostConstruct
+	private void setup() {
+		if(insert != null) {
+			insert.setCommonDao(this.공통데이터접근기);
+			insert.setQueryIdGenerator(this.쿼리아이디생성기);
+		}
+		if(update != null) {
+			update.setCommonDao(this.공통데이터접근기);
+			update.setQueryIdGenerator(this.쿼리아이디생성기);
+		}
+		if(select != null) {
+			select.setCommonDao(this.공통데이터접근기);
+			select.setQueryIdGenerator(this.쿼리아이디생성기);
+		}
 	}
 
 

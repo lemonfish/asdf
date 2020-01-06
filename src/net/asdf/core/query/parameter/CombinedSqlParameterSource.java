@@ -1,5 +1,5 @@
 
-package net.asdf.core.query;
+package net.asdf.core.query.parameter;
 
 import org.springframework.jdbc.core.namedparam.AbstractSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
