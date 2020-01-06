@@ -56,6 +56,9 @@ public class SSQLQueryLoader implements QueryLoader {
 	@Value("#{asdf['query.file.encoding'] ?: 'UTF-8'}")
 	private String encoding;
 
+	@Value("#{asdf['query.databasetype'] ?: 'oracle'}")
+	private String databaseType;
+
 	private Matcher blankMatcher = Pattern.compile("\\s*|^\\s*//.*").matcher("");
 	private Matcher queryIdMatcher = Pattern.compile("^> ([a-zA-Z0-9ㄱ-힣._\\-]*)").matcher("");
 	private Matcher namespaceMatcher = Pattern.compile("\\s*namespace ([a-zA-Z0-9ㄱ-힣._\\-]*)").matcher("");
@@ -67,7 +70,9 @@ public class SSQLQueryLoader implements QueryLoader {
 	private WriteLock wlock = rwlock.writeLock();
 
 	private Resource[] systemResources;
+	private Resource[] systemVendorResources;
 	private Resource[] userResources;
+	private Resource[] userVendorResources;
 	private Resource[] resources;
 
 	/* NOTE {@literal @}Resource는 생성자 주입을 지원 안하네... */
@@ -162,9 +167,17 @@ public class SSQLQueryLoader implements QueryLoader {
 			logger.warn("프레임워크 공통 쿼리를 추출할 수 없음 : {}", ioe.getMessage());
 		}
 
+		try {
+			this.systemVendorResources = resolver.getResources("net/asdf/common/**/*.ssql." + databaseType);
+		}catch(IOException ioe) {
+			this.systemVendorResources = new Resource[0];
+			logger.info("DB 종속된 프레임워크 공통 쿼리가 없음 : {}", ioe.getMessage());
+		}
+
 		String[] patterns = this.pattern.split(",");
 
 		ArrayList<Resource> userResourceArray = new ArrayList<Resource>(this.pattern.length() * 20);
+		ArrayList<Resource> userVendorResourceArray = new ArrayList<Resource>(this.pattern.length() * 20);
 
 		for (int i = 0; i < patterns.length; i++) {
 			try {
@@ -173,8 +186,17 @@ public class SSQLQueryLoader implements QueryLoader {
 			}catch(IOException ioe) {
 				logger.warn("{} 패턴으로부터 쿼리를 추출할 수 없음", patterns[i]);
 			}
+			try {
+				Resource[] resources = resolver.getResources(patterns[i].trim().replace(".", "/") + "/**/*.ssql." + databaseType);
+				Collections.addAll(userVendorResourceArray, resources);
+			}catch(IOException ioe) {
+				logger.info("{} 패턴에 DB 종속된 쿼리가 없음", patterns[i]);
+			}
 		}
-
+		/*
+		 * 자동 생성된 쿼리를 먼저 로딩하고 사용자가 작성한 쿼리를 로딩해야 한다.
+		 * 그래야 자동 생성된 쿼리의 덮어쓰기가 가능.
+		 */
 		userResourceArray.sort(new Comparator<Resource>() {
 			@Override
 			public int compare(Resource o1, Resource o2) {
@@ -190,23 +212,27 @@ public class SSQLQueryLoader implements QueryLoader {
 			}
 		});
 
-
 		this.userResources = new Resource[userResourceArray.size()];
 		userResourceArray.toArray(this.userResources);
 		userResourceArray = null;
 
+		this.userVendorResources = new Resource[userVendorResourceArray.size()];
+		userVendorResourceArray.toArray(this.userVendorResources);
+		userVendorResourceArray = null;
 
-		this.resources = new Resource[this.systemResources.length + this.userResources.length];
 
-		System.arraycopy(this.systemResources, 0, this.resources, 0, this.systemResources.length);
-		System.arraycopy(this.userResources, 0, this.resources, this.systemResources.length, this.userResources.length);
+		this.resources = new Resource[this.systemResources.length + this.userResources.length + this.systemVendorResources.length + this.userVendorResources.length];
+
+		/* 시스템 쿼리는 덮어 씌여지면 안되므로 사용자 쿼리를 먼저 로딩하고 시스템 쿼리는 나중에 로딩한다. */
+		System.arraycopy(this.userResources, 0, this.resources, 0, this.userResources.length);
+		System.arraycopy(this.userVendorResources, 0, this.resources, this.userResources.length, this.userVendorResources.length);
+		System.arraycopy(this.systemResources, 0, this.resources, this.userResources.length + this.userVendorResources.length, this.systemResources.length);
+		System.arraycopy(this.systemVendorResources, 0, this.resources, this.userResources.length + this.userVendorResources.length + this.systemResources.length, this.systemVendorResources.length);
+
 
 
 		logger.info("query loader init start");
 
-		/* TODO 자동 생성된 쿼리를 먼저 로딩하고 사용자가 작성한 쿼리를 로딩해야 한다.
-		 * 그래야 자동 생성된 쿼리의 덮어쓰기가 가능.
-		 */
 		for (Resource resource : resources) {
 			load(resource);
 		}
@@ -288,11 +314,6 @@ public class SSQLQueryLoader implements QueryLoader {
 
 	private void fireQueryReloadEvent(List<String> unmodifiableReloadedQueryIds) {
 		this.eventPublisher.publishEvent(new QueryReloadEvent(unmodifiableReloadedQueryIds));
-	}
-
-	public static void main(String[] args) {
-//		System.out.println(SSQLQueryLoader.class.getResource("/"));
-			System.out.println("".split(",")[0]);
 	}
 
 }
