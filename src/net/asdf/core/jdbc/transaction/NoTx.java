@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@Transactional(propagation = Propagation.SUPPORTS)
+@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 public @interface NoTx {
 
 }

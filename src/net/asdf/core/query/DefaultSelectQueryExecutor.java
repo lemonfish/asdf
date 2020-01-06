@@ -17,10 +17,10 @@ import net.asdf.core.query.template.TemplateResult;
 @Component
 public class DefaultSelectQueryExecutor extends AbstractQueryExecutor {
 
-	@Value("#{config['query.fetchsize'] ?: 10}")
+	@Value("#{asdf['query.fetchsize'] ?: 10}")
 	private int defaultFetchSize;
 
-	@Value("#{config['query.maxrows'] ?: 10000}")
+	@Value("#{asdf['query.maxrows'] ?: 10000}")
 	private int defaultMaxRows;
 
 

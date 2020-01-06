@@ -15,7 +15,7 @@ import net.asdf.core.query.template.freemarker.FreeMarkerViewTool;
 @Component
 public class HasNotNull implements FreeMarkerQueryTool, FreeMarkerViewTool {
 
-	@Value("#{config['query.databasetype'] ?: 'oracle'}")
+	@Value("#{asdf['query.databasetype'] ?: 'oracle'}")
 	protected String databaseType;
 
 	private String[] names = new String[] {"hasNotNull", "hnn"};

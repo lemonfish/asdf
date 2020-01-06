@@ -22,13 +22,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class CipherService {
 
-	@Value("#{salt}")
+	@Value("#{asdf['secret.salt'] ?: '1234567890123456'}")
 	private String 소금;
 
-	@Value("#{secret}")
+	@Value("#{asdf['secret.key'] ?: '1234567890123456'}")
 	private String 시크릿;
 
-	@Value("#{secretIV}")
+	@Value("#{asdf['secret.iv']} ?: '1234567890123456'}")
 	private String 초기값;
 
 	/**

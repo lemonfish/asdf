@@ -49,10 +49,10 @@ public class QueryLoader {
 
 	private List<String> reloadedQueryIds = new ArrayList<String>();
 
-	@Value("#{config['query.file.pattern']}")
+	@Value("#{asdf['query.file.pattern']}")
 	private String pattern;
 
-	@Value("#{config['query.file.encoding']}")
+	@Value("#{asdf['query.file.encoding']}")
 	private String encoding;
 
 	private Matcher blankMatcher = Pattern.compile("\\s*|^\\s*//.*").matcher("");

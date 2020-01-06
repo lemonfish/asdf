@@ -29,7 +29,7 @@ public class AbstractQueryExecutor implements QueryExecutor, InitializingBean {
 	@Resource
 	protected DataSource dataSource;
 
-	@Value("#{config['query.databasetype'] ?: 'oracle'}")
+	@Value("#{asdf['query.databasetype'] ?: 'oracle'}")
 	protected String databaseType;
 
 	@Resource(name="defaultNamedParameterJdbcTemplate")

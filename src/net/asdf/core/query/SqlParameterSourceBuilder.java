@@ -46,10 +46,10 @@ public class SqlParameterSourceBuilder {
 
     private Logger logger = LogManager.getLogger();
 
-    @Value("#{config_template['singlevaluename' ?: 'value']}")
+    @Value("#{query['singlevaluename' ?: 'value']}")
     private String singleValueName = "value";
 
-    @Autowired
+    @Autowired(required = false)
     private CipherService cipherService;
 
     @Resource
@@ -252,7 +252,11 @@ public class SqlParameterSourceBuilder {
 		        		Object value = null;
 		        		try {
 		        			ReflectionUtils.makeAccessible(field);
-							value = cipherService.cipher((String) field.get(paramBean));
+		        			if(cipherService != null) {
+		        				value = cipherService.cipher((String) field.get(paramBean));
+		        			}else {
+		        				value = (String) field.get(paramBean);
+		        			}
 						} catch (IllegalArgumentException | IllegalAccessException e) {
 							e.printStackTrace();
 						} catch (InvalidKeyException e) {
@@ -279,7 +283,11 @@ public class SqlParameterSourceBuilder {
 		        		Object value = null;
 		        		try {
 		        			ReflectionUtils.makeAccessible(field);
-							value = cipherService.password((String) field.get(paramBean));
+		        			if(cipherService != null) {
+		        				value = cipherService.password((String) field.get(paramBean));
+		        			}else {
+		        				value = (String) field.get(paramBean);
+		        			}
 						} catch (IllegalArgumentException e) {
 							e.printStackTrace();
 						} catch (IllegalAccessException e) {
