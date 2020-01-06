@@ -63,7 +63,7 @@ public class FreeMarkerQueryTemplateEngine implements QueryTemplateEngine{
 	@Value("#{asdf['query.encoding.input'] ?: 'UTF-8'}")
 	private String inputEncoding;
 
-	@Value("#{adsf['query.encoding.output'] ?: 'UTF-8'}")
+	@Value("#{asdf['query.encoding.output'] ?: 'UTF-8'}")
 	private String outputEncoding;
 
 	@Resource
